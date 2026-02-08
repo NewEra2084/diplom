@@ -1,9 +1,11 @@
 package com.srt.CRMBackend.models.employees;
 
+import com.srt.CRMBackend.models.tasks.Request;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 

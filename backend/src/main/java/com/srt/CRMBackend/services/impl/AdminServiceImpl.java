@@ -3,10 +3,14 @@ package com.srt.CRMBackend.services.impl;
 import com.srt.CRMBackend.DTO.admin.AddEmployeeRequest;
 import com.srt.CRMBackend.DTO.admin.JobTitleRequest;
 import com.srt.CRMBackend.DTO.admin.AddQualificationRequest;
+import com.srt.CRMBackend.DTO.employee.UpdateEmployeeRequest;
+import com.srt.CRMBackend.exceptions.CrmBadRequestException;
 import com.srt.CRMBackend.exceptions.admin.ValidationException;
 import com.srt.CRMBackend.exceptions.admin.ValidationOneFieldException;
+import com.srt.CRMBackend.mappers.EmployeeMapper;
 import com.srt.CRMBackend.models.employees.*;
 import com.srt.CRMBackend.repositories.employee.*;
+import com.srt.CRMBackend.repositories.tasks.RequestRepository;
 import com.srt.CRMBackend.services.AdminService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +30,7 @@ public class AdminServiceImpl implements AdminService {
     private final JobTitleRepository jobTitleRepository;
     private final PersonalEmployeeDataRepository personalEmployeeDataRepository;
     private final PointRepository pointRepository;
+    private final RequestRepository requestRepository;
 
     @Override
     public void addEmployee(AddEmployeeRequest request) {
@@ -106,7 +111,24 @@ public class AdminServiceImpl implements AdminService {
     public void deleteEmployee(UUID id) {
         personalEmployeeDataRepository.deleteByEmployeeId(id);
         pointRepository.deleteByEmployeeId(id);
+        requestRepository.deleteByAppointorId(id);
         employeeRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public void updateEmployee(UpdateEmployeeRequest request) {
+        Employee employee = employeeRepository.findById(request.getId())
+                .orElseThrow(() -> new CrmBadRequestException("работник с таким id не найден"));
+        Qualification qualification = qualificationRepository.findById(request.getQualificationId())
+                .orElseThrow(() -> new CrmBadRequestException("квалификация с таким id не найдена"));
+        Role role = roleRepository.findByName(request.getRoleName())
+                .orElseThrow(() -> new CrmBadRequestException("роль с таким id не найдена"));
+        employee.setLogin(request.getLogin());
+        employee.setEmail(request.getEmail());
+        employee.setFullName(new FullName(request.getFirstName(), request.getLastName(), request.getPatronymic()));
+        employee.setQualification(qualification);
+        employee.setRoles(Set.of(role));
     }
 
     private void validateAddEmployee(AddEmployeeRequest request) {

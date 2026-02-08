@@ -22,4 +22,10 @@ public class FullName {
     private String firstName;
     private String lastName;
     private String patronymic;
+
+    public FullName(String firstName, String lastName, String patronymic) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.patronymic = patronymic;
+    }
 }

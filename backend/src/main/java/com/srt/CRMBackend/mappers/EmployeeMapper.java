@@ -1,6 +1,7 @@
 package com.srt.CRMBackend.mappers;
 
 import com.srt.CRMBackend.DTO.employee.EmployeeDTO;
+import com.srt.CRMBackend.DTO.employee.UpdateEmployeeRequest;
 import com.srt.CRMBackend.models.employees.Employee;
 import com.srt.CRMBackend.models.employees.Role;
 import org.mapstruct.Mapper;

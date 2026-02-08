@@ -3,6 +3,7 @@ package com.srt.CRMBackend.services;
 import com.srt.CRMBackend.DTO.admin.AddEmployeeRequest;
 import com.srt.CRMBackend.DTO.admin.JobTitleRequest;
 import com.srt.CRMBackend.DTO.admin.AddQualificationRequest;
+import com.srt.CRMBackend.DTO.employee.UpdateEmployeeRequest;
 
 import java.util.UUID;
 
@@ -14,4 +15,6 @@ public interface AdminService {
     void deleteJobTitle(UUID id);
     void deleteQualification(UUID id);
     void deleteEmployee(UUID id);
+
+    void updateEmployee(UpdateEmployeeRequest request);
 }

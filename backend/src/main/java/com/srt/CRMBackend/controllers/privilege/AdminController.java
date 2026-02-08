@@ -3,6 +3,7 @@ package com.srt.CRMBackend.controllers.privilege;
 import com.srt.CRMBackend.DTO.admin.AddEmployeeRequest;
 import com.srt.CRMBackend.DTO.admin.JobTitleRequest;
 import com.srt.CRMBackend.DTO.admin.AddQualificationRequest;
+import com.srt.CRMBackend.DTO.employee.UpdateEmployeeRequest;
 import com.srt.CRMBackend.services.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -134,10 +135,17 @@ public class AdminController {
         return Map.of("message", "квалификация успешно удалена");
     }
 
-//    todo
-//    @DeleteMapping("/delete/employee/{employeeId}")
-//    public Map<String, String> deleteEmployee(@PathVariable UUID employeeId) {
-//        adminService.deleteEmployee(employeeId);
-//        return Map.of("message", "работник успешно удален");
-//    }
+    @Operation(description = "удаление сотрудника")
+    @DeleteMapping("/delete/employee/{employeeId}")
+    public Map<String, String> deleteEmployee(@PathVariable UUID employeeId) {
+        adminService.deleteEmployee(employeeId);
+        return Map.of("message", "работник успешно удален");
+    }
+
+    @Operation(description = "обновление данных о сотруднике")
+    @PostMapping("/update/employee")
+    public Map<String, String> updateEmployee(@RequestBody @Valid UpdateEmployeeRequest request) {
+        adminService.updateEmployee(request);
+        return Map.of("message", "поля работника успешно обновлены");
+    }
 }
