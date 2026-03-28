@@ -1,11 +1,16 @@
--- Таблица: task_categories
 CREATE TABLE task_categories (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(255) UNIQUE,
     description VARCHAR(255)
 );
 
--- Таблица: tasks
+CREATE TABLE projects (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    manager_id UUID REFERENCES employees(id)
+);
+
 CREATE TABLE tasks (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(255),
@@ -15,10 +20,10 @@ CREATE TABLE tasks (
     publication_time TIMESTAMP,
     status VARCHAR(50),
     task_category_id UUID,
+    project_id UUID REFERENCES projects(id),
     CONSTRAINT fk_task_category FOREIGN KEY (task_category_id) REFERENCES task_categories(id)
 );
 
--- Таблица: employee_tasks
 CREATE TABLE employee_tasks (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     employee_id UUID,
@@ -28,7 +33,6 @@ CREATE TABLE employee_tasks (
     CONSTRAINT fk_employee_task_task FOREIGN KEY (task_id) REFERENCES tasks(id)
 );
 
--- Таблица: qualification_level_for_task
 CREATE TABLE qualification_level_for_task (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     qualification_id UUID,
@@ -37,7 +41,6 @@ CREATE TABLE qualification_level_for_task (
     CONSTRAINT fk_qual_for_task_task FOREIGN KEY (task_id) REFERENCES tasks(id)
 );
 
--- Таблица: requests
 CREATE TABLE requests (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     is_accepted BOOLEAN,

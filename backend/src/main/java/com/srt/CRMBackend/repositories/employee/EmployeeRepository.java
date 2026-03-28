@@ -42,4 +42,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
         WHERE e.qualification.id = :qualificationId
     """)
     boolean existsByQualificationId(UUID qualificationId);
+
+    boolean existsByIdAndRoles_Name(UUID id, String name);
 }

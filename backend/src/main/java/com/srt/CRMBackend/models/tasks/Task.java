@@ -38,6 +38,10 @@ public class Task {
     @JoinColumn(name = "task_category_id")
     private TaskCategory taskCategory;
 
+    @ManyToOne
+    @JoinColumn(name = "project_id")
+    private Project project;
+
     public Task(UUID id) {
         this.id = id;
     }

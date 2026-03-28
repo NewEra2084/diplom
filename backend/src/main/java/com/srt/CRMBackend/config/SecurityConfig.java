@@ -38,6 +38,7 @@ public class SecurityConfig {
                         .requestMatchers("/task/get/**").authenticated()
                         .requestMatchers("/task/employee/**").authenticated()
                         .requestMatchers("/task/**").hasAnyRole(new String[] {"ADMIN", "MANAGER"})
+                        .requestMatchers("/project/**").hasAnyRole(new String[] {"ADMIN", "MANAGER"})
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(manager -> manager
