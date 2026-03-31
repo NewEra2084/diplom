@@ -20,4 +20,6 @@ public class TaskRequest {
     private LocalDate deadline;
     @NotNull
     private UUID taskCategoryId;
+    @NotNull
+    private UUID projectId;
 }

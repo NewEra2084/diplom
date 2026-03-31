@@ -6,10 +6,13 @@ import com.srt.CRMBackend.DTO.task.TaskCategoryDTO;
 import com.srt.CRMBackend.DTO.task.TaskResponse;
 import com.srt.CRMBackend.auth.UserDetailsImpl;
 import com.srt.CRMBackend.exceptions.CrmBadRequestException;
+import com.srt.CRMBackend.mappers.ProjectMapper;
 import com.srt.CRMBackend.models.employees.Role;
+import com.srt.CRMBackend.models.tasks.Project;
 import com.srt.CRMBackend.models.tasks.Task;
 import com.srt.CRMBackend.models.tasks.TaskCategory;
 import com.srt.CRMBackend.models.tasks.TaskStatus;
+import com.srt.CRMBackend.repositories.tasks.ProjectRepository;
 import com.srt.CRMBackend.repositories.tasks.TaskRepository;
 import com.srt.CRMBackend.repositories.tasks.TaskCategoryRepository;
 import com.srt.CRMBackend.services.task.TaskService;
@@ -27,12 +30,18 @@ import java.time.LocalDateTime;
 public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
     private final TaskCategoryRepository taskCategoryRepository;
+    private final ProjectRepository projectRepository;
+    private final ProjectMapper projectMapper;
 
     @Override
     public void addTask(TaskRequest request) {
         TaskCategory taskCategory = taskCategoryRepository
                 .findById(request.getTaskCategoryId())
                 .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор категории задачи"));
+
+        Project project = projectRepository
+                .findById(request.getProjectId())
+                .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор проекта"));
 
         Task task = Task.builder()
                 .name(request.getName())
@@ -42,6 +51,7 @@ public class TaskServiceImpl implements TaskService {
                 .publicationTime(LocalDateTime.now())
                 .status(TaskStatus.FREE)
                 .taskCategory(taskCategory)
+                .project(project)
                 .build();
         taskRepository.save(task);
     }
@@ -77,7 +87,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<TaskResponse> getAllTasks() {
-        return taskRepository.findAllWithCategory().stream()
+        return taskRepository.findAllWithCategoryAndProject().stream()
                 .filter(this::isPrivateTask)
                 .map(t -> TaskResponse.builder()
                         .id(t.getId())
@@ -90,6 +100,7 @@ public class TaskServiceImpl implements TaskService {
                                 .name(t.getTaskCategory().getName())
                                 .description(t.getTaskCategory().getDescription()).build()
                         )
+                        .project(projectMapper.toResponse(t.getProject()))
                         .status(t.getStatus()).build()
                 ).toList();
     }
