@@ -1,11 +1,12 @@
 package com.srt.CRMBackend.models.employees;
 
-import com.srt.CRMBackend.models.tasks.Request;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -43,6 +44,9 @@ public class Employee {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
+
+    @Column(columnDefinition = "TEXT")
+    private String avatarPath;
 
     public Employee(UUID id) {
         this.id = id;

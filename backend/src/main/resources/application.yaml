@@ -35,3 +35,6 @@ admin:
   login: admin
   email: admin@ad.min
   password: admin
+
+storage:
+  location: /home/artem/tmp/uploads/
