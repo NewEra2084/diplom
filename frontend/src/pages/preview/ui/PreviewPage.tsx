@@ -1,6 +1,4 @@
-type Props = {}
-
-export default function PreviewPage(props: Props) {
+export default function PreviewPage() {
   return (
     <div>PreviewPage</div>
   )
