@@ -23,7 +23,7 @@ public class CompanyController {
     }
 
     @PutMapping("/update")
-    @Operation(description = "обновление информации о компании (пока доступно только создателю)")
+    @Operation(description = "обновление информации о компании (доступна администраторам в данной компании)")
     public void update(@Valid @RequestBody UpdateCompanyRequest request) {
         companyService.update(request);
     }

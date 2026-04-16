@@ -19,17 +19,17 @@ import java.util.List;
 public class ManagerController {
     private final ManagerService managerService;
 
-    @GetMapping("/get_all_job_titles")
+    @GetMapping("/get/job_title")
     public List<JobTitleDTO> getAllJobTitles() {
         return managerService.getAllJobTitles();
     }
 
-    @GetMapping("/get_all_qualifications")
+    @GetMapping("/get/qualification")
     public List<QualificationResponse> getAllQualifications() {
         return managerService.getAllQualifications();
     }
 
-    @GetMapping("/get_all_employees")
+    @GetMapping("/get/employee")
     public List<EmployeeDTO> getAllEmployees() {
         return managerService.getAllEmployees();
     }

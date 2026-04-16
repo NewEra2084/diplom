@@ -7,16 +7,18 @@ import com.srt.CRMBackend.DTO.employee.UpdateEmployeeRequest;
 import com.srt.CRMBackend.exceptions.CrmBadRequestException;
 import com.srt.CRMBackend.exceptions.admin.ValidationException;
 import com.srt.CRMBackend.exceptions.admin.ValidationOneFieldException;
+import com.srt.CRMBackend.models.Company;
 import com.srt.CRMBackend.models.employees.*;
 import com.srt.CRMBackend.repositories.employee.*;
 import com.srt.CRMBackend.repositories.tasks.RequestRepository;
 import com.srt.CRMBackend.services.AdminService;
+import com.srt.CRMBackend.services.company.domain.CompanyDomainService;
+import com.srt.CRMBackend.util.AuthHelperUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -27,19 +29,28 @@ public class AdminServiceImpl implements AdminService {
     private final RoleRepository roleRepository;
     private final QualificationRepository qualificationRepository;
     private final JobTitleRepository jobTitleRepository;
-    private final PersonalEmployeeDataRepository personalEmployeeDataRepository;
     private final PointRepository pointRepository;
     private final RequestRepository requestRepository;
+    private final CompanyDomainService companyDomainService;
+    private final AuthHelperUtil authHelperUtil;
 
     @Override
     public void addEmployee(AddEmployeeRequest request) {
         validateAddEmployee(request);
 
-        Qualification qualification = qualificationRepository
-                .findById(request.getQualificationId())
-                .orElseThrow(() -> new ValidationException(
-                        Map.of("qualification", "неверный идентификатор квалификации"))
-                );
+        Qualification qualification = null;
+
+        if (request.getQualificationId() != null) {
+            qualification = qualificationRepository
+                    .findById(request.getQualificationId())
+                    .orElseThrow(() -> new ValidationException(
+                            Map.of("qualification", "неверный идентификатор квалификации"))
+                    );
+        }
+
+        Company company = companyDomainService.getReferenceById(
+                authHelperUtil.getEmployee().getCompany().getId()
+        );
 
         FullName fullName = FullName.builder()
                 .firstName(request.getFirstName())
@@ -52,20 +63,17 @@ public class AdminServiceImpl implements AdminService {
                 .fullName(fullName)
                 .password(passwordEncoder.encode(request.getPassword()))
                 .qualification(qualification)
+                .company(company)
                 .roles(Set.of(roleRepository.getByName(request.getRole()))).build();
         employeeRepository.save(employee);
-
-        PersonalEmployeeData employeeData = PersonalEmployeeData.builder()
-                .employee(employee)
-                .passportNumber(request.getPassportNumber())
-                .passportSeries(request.getPassportSeries())
-                .dateOfEmployment(LocalDate.now()).build();
-        personalEmployeeDataRepository.save(employeeData);
     }
 
     @Override
     public void addJobTitle(JobTitleRequest request) {
-        if (jobTitleRepository.existsByName(request.getName())) {
+        Company company = companyDomainService.getReferenceById(
+                authHelperUtil.getEmployee().getCompany().getId());
+
+        if (jobTitleRepository.existsByNameAndCompany(request.getName(), company)) {
             throw new ValidationException(
                     Map.of("name", "такая должность уже существует")
             );
@@ -74,6 +82,7 @@ public class AdminServiceImpl implements AdminService {
         JobTitle jobTitle = JobTitle.builder()
                 .name(request.getName())
                 .description(request.getDescription())
+                .company(company)
                 .build();
         jobTitleRepository.save(jobTitle);
     }
@@ -83,9 +92,14 @@ public class AdminServiceImpl implements AdminService {
         JobTitle jobTitle = jobTitleRepository.findById(request.getJobTitleId())
                 .orElseThrow(() -> new ValidationOneFieldException("передан неверный идентификатор"));
 
+        if (qualificationRepository.existsByJobTitleAndName(jobTitle, request.getQualificationName())) {
+            throw new ValidationOneFieldException("название должно быть уникально");
+        }
+
         Qualification qualification = Qualification.builder()
                 .name(request.getQualificationName())
                 .jobTitle(jobTitle).build();
+
         qualificationRepository.save(qualification);
     }
 
@@ -108,26 +122,32 @@ public class AdminServiceImpl implements AdminService {
     @Transactional
     @Override
     public void deleteEmployee(UUID id) {
-        personalEmployeeDataRepository.deleteByEmployeeId(id);
         pointRepository.deleteByEmployeeId(id);
         requestRepository.deleteByAppointorId(id);
         employeeRepository.deleteById(id);
     }
 
     @Override
-    @Transactional
     public void updateEmployee(UpdateEmployeeRequest request) {
         Employee employee = employeeRepository.findById(request.getId())
                 .orElseThrow(() -> new CrmBadRequestException("работник с таким id не найден"));
-        Qualification qualification = qualificationRepository.findById(request.getQualificationId())
-                .orElseThrow(() -> new CrmBadRequestException("квалификация с таким id не найдена"));
+
+        Qualification qualification = null;
+        if (request.getQualificationId() != null) {
+            qualification = qualificationRepository.findById(request.getQualificationId())
+                    .orElseThrow(() -> new CrmBadRequestException("квалификация с таким id не найдена"));
+        }
+
         Role role = roleRepository.findByName(request.getRoleName())
                 .orElseThrow(() -> new CrmBadRequestException("роль с таким id не найдена"));
+
         employee.setLogin(request.getLogin());
         employee.setEmail(request.getEmail());
         employee.setFullName(new FullName(request.getFirstName(), request.getLastName(), request.getPatronymic()));
         employee.setQualification(qualification);
         employee.setRoles(Set.of(role));
+
+        employeeRepository.save(employee);
     }
 
     private void validateAddEmployee(AddEmployeeRequest request) {

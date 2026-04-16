@@ -1,8 +1,10 @@
 package com.srt.CRMBackend.models.employees;
 
+import com.srt.CRMBackend.models.Company;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -17,9 +19,15 @@ public class JobTitle {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(unique = true)
     private String name;
 
     @Column(columnDefinition = "TEXT")
     private String description;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "company_id")
+    private Company company;
+
+    @OneToMany(mappedBy = "jobTitle", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Qualification> qualifications;
 }

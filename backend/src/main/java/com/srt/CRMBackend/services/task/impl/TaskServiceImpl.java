@@ -7,6 +7,7 @@ import com.srt.CRMBackend.DTO.task.TaskResponse;
 import com.srt.CRMBackend.auth.UserDetailsImpl;
 import com.srt.CRMBackend.exceptions.CrmBadRequestException;
 import com.srt.CRMBackend.mappers.ProjectMapper;
+import com.srt.CRMBackend.models.Company;
 import com.srt.CRMBackend.models.employees.Role;
 import com.srt.CRMBackend.models.tasks.Project;
 import com.srt.CRMBackend.models.tasks.Task;
@@ -15,7 +16,9 @@ import com.srt.CRMBackend.models.tasks.TaskStatus;
 import com.srt.CRMBackend.repositories.tasks.ProjectRepository;
 import com.srt.CRMBackend.repositories.tasks.TaskRepository;
 import com.srt.CRMBackend.repositories.tasks.TaskCategoryRepository;
+import com.srt.CRMBackend.services.company.domain.CompanyDomainService;
 import com.srt.CRMBackend.services.task.TaskService;
+import com.srt.CRMBackend.util.AuthHelperUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -30,8 +33,11 @@ import java.time.LocalDateTime;
 public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
     private final TaskCategoryRepository taskCategoryRepository;
+
     private final ProjectRepository projectRepository;
     private final ProjectMapper projectMapper;
+    private final CompanyDomainService companyDomainService;
+    private final AuthHelperUtil authHelperUtil;
 
     @Override
     public void addTask(TaskRequest request) {
@@ -63,13 +69,15 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void addTaskCategory(TaskCategoryRequest request) {
-        if (taskCategoryRepository.existsByName(request.getName())) {
+        Company company = companyDomainService.getCompanyReference();
+        if (taskCategoryRepository.existsByNameAndCompany(request.getName(), company)) {
             throw new CrmBadRequestException("некорректное имя категории");
         }
 
         TaskCategory taskCategory = TaskCategory.builder()
                 .name(request.getName())
                 .description(request.getDescription())
+                .company(company)
                 .build();
 
         taskCategoryRepository.save(taskCategory);
@@ -77,7 +85,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<TaskCategoryDTO> getAllTaskCategories() {
-        return taskCategoryRepository.findAll().stream()
+        return taskCategoryRepository.findAllByCompany(companyDomainService.getCompanyReference()).stream()
                 .map(c -> TaskCategoryDTO.builder()
                         .id(c.getId())
                         .name(c.getName())

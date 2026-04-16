@@ -1,5 +1,6 @@
 package com.srt.CRMBackend.repositories.employee;
 
+import com.srt.CRMBackend.models.Company;
 import com.srt.CRMBackend.models.employees.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -33,9 +34,9 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
         JOIN FETCH e.roles
         LEFT JOIN FETCH e.qualification eq
         LEFT JOIN FETCH eq.jobTitle
+        WHERE e.company = :company
         """)
-    List<Employee> findAllWithRolesAndQualificationAndJobTitle();
-
+    List<Employee> findAllByCompanyWithRolesAndQualificationAndJobTitle(Company company);
 
     @Query("""
         SELECT count(e) > 0 FROM Employee e

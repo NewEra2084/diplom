@@ -1,10 +1,9 @@
 package com.srt.CRMBackend.models;
 
-import com.srt.CRMBackend.models.employees.Employee;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -19,17 +18,15 @@ public class Company {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String name;
 
+    @Column(nullable = false)
     private String address;
-
-    @ManyToOne
-    @JoinColumn(nullable = false, name = "creator_id")
-    private Employee creator;
 
     @Column(columnDefinition = "TEXT")
     private String fieldOfEmployment;
 
-    private Instant subscribeFireDate;
+    @Column(nullable = false)
+    private LocalDate subscribeFireDate;
 }

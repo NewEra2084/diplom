@@ -25,7 +25,7 @@ import java.util.UUID;
 public class AdminController {
     private final AdminService adminService;
 
-    @Operation(description = "регистрация работников, виды ролей (ROLE_EMPLOYEE, ROLE_ADMIN, ROLE_MANAGER)")
+    @Operation(description = "Регистрация работников, виды ролей (ROLE_EMPLOYEE, ROLE_ADMIN, ROLE_MANAGER); квалификация может быть null (это для админов и менеджеров)")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "400",
@@ -55,19 +55,19 @@ public class AdminController {
                     ))
             )
     })
-    @PostMapping("/add_employee")
+    @PostMapping("/add/employee")
     public Map<String, String> addEmployee(@Valid @RequestBody AddEmployeeRequest request) {
         adminService.addEmployee(request);
         return Map.of("message", "работник успешно добавлен");
     }
 
-    @PostMapping("/add_job_title")
+    @PostMapping("/add/job_title")
     public Map<String, String> addJobTitle(@Valid @RequestBody JobTitleRequest request) {
         adminService.addJobTitle(request);
         return Map.of("message", "должность успешно добавлена");
     }
 
-    @PostMapping("/add_qualification")
+    @PostMapping("/add/qualification")
     public Map<String, String> addQualification(@Valid @RequestBody AddQualificationRequest request) {
         adminService.addQualification(request);
         return Map.of("message", "квалификация успешно добавлена");
@@ -143,7 +143,7 @@ public class AdminController {
     }
 
     @Operation(description = "обновление данных о сотруднике")
-    @PostMapping("/update/employee")
+    @PutMapping("/update/employee")
     public Map<String, String> updateEmployee(@RequestBody @Valid UpdateEmployeeRequest request) {
         adminService.updateEmployee(request);
         return Map.of("message", "поля работника успешно обновлены");

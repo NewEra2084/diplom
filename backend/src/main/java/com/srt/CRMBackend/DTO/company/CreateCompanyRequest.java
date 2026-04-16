@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
@@ -17,7 +17,7 @@ public class CreateCompanyRequest {
     @NotBlank
     private String fieldOfEmployment;
     @NotNull
-    private Instant subscribeFireDate;
+    private LocalDate subscribeFireDate;
     @NotNull
     private CreateAdminRequest admin;
 }

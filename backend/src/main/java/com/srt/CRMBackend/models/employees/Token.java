@@ -17,10 +17,10 @@ public class Token {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "employee_id")
     private Employee employee;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String token;
 }
