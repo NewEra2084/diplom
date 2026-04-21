@@ -49,8 +49,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
         tokenRepository.save(token);
 
-        authenticate(request);
-
         return jwtDto;
     }
 
@@ -71,14 +69,5 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         token.setToken(jwtDTO.getRefreshToken());
         return jwtDTO;
-    }
-
-    private void authenticate(SignInRequest request) {
-        Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(
-                        request.getLogin(),
-                        request.getPassword()
-                ));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }

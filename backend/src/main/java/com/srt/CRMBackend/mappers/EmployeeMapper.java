@@ -1,8 +1,10 @@
 package com.srt.CRMBackend.mappers;
 
+import com.srt.CRMBackend.DTO.company.CreateAdminRequest;
 import com.srt.CRMBackend.DTO.employee.EmployeeDTO;
 import com.srt.CRMBackend.DTO.employee.UpdateEmployeeRequest;
 import com.srt.CRMBackend.models.employees.Employee;
+import com.srt.CRMBackend.models.employees.FullName;
 import com.srt.CRMBackend.models.employees.Role;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -20,6 +22,10 @@ public interface EmployeeMapper {
     @Mapping(target = "qualificationName", source = "qualification.name")
     @Mapping(target = "rolesName", source = "roles", qualifiedByName = "rolesToRoleNames")
     EmployeeDTO toEmployeeDTO(Employee employee);
+
+    Employee toEntity(CreateAdminRequest request);
+
+    FullName toFullName(CreateAdminRequest request);
 
     @Named("rolesToRoleNames")
     default Set<String> rolesToRoleNames(Set<Role> roles) {

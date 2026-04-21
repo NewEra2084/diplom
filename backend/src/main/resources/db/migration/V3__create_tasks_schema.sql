@@ -1,14 +1,24 @@
-CREATE TABLE task_categories (
+CREATE TABLE companies (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name VARCHAR(255) UNIQUE,
-    description VARCHAR(255)
+    name VARCHAR(255) UNIQUE NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    creator_id UUID REFERENCES employees(id) NOT NULL,
+    field_of_employment TEXT NOT NULL,
+    subscribe_fire_date TIMESTAMP DEFAULT NOW() NOT NULL
 );
 
 CREATE TABLE projects (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
-    manager_id UUID REFERENCES employees(id)
+    manager_id UUID REFERENCES employees(id),
+    company_id UUID REFERENCES companies(id)
+);
+
+CREATE TABLE task_categories (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) UNIQUE,
+    description VARCHAR(255)
 );
 
 CREATE TABLE tasks (
