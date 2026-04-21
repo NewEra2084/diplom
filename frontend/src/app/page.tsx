@@ -1,7 +1,7 @@
-import { PreviewPage } from "@/pages/preview";
+import { PreviewPage } from "@/routes/preview";
 
-export default function Page() {
-    return (
-        <PreviewPage/>
-    );
+export default function Page(){
+  return (
+    <PreviewPage/>
+  )
 }
