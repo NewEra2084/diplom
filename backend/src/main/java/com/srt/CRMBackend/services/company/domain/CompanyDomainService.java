@@ -28,4 +28,8 @@ public class CompanyDomainService {
     public Company getCompanyReference() {
         return getReferenceById(authHelperUtil.getEmployee().getCompany().getId());
     }
+
+    public boolean compareByCurrent(Company company) {
+        return company.getId().equals(getCompanyReference().getId());
+    }
 }

@@ -2,6 +2,7 @@ package com.srt.CRMBackend.controllers.task;
 
 import com.srt.CRMBackend.DTO.task.TaskCategoryRequest;
 import com.srt.CRMBackend.DTO.task.TaskRequest;
+import com.srt.CRMBackend.DTO.task.UpdateTaskRequest;
 import com.srt.CRMBackend.services.task.TaskService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -28,6 +29,12 @@ public class TaskController {
     public Map<String, String> deleteTask(@PathVariable UUID taskId) {
         taskService.deleteTask(taskId);
         return Map.of("message", "задача успешно удалена");
+    }
+
+    @PutMapping("/update")
+    public Map<String, String> updateTask(@Valid @RequestBody UpdateTaskRequest request) {
+        taskService.updateTask(request);
+        return Map.of("message", "задача успешно обновлена");
     }
 
     @PostMapping("/add_task_category")

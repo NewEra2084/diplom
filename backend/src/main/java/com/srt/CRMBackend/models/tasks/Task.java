@@ -39,7 +39,8 @@ public class Task {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TaskStatus status;
+    @Builder.Default
+    private TaskStatus status = TaskStatus.FREE;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "task_category_id")

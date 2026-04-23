@@ -1,5 +1,6 @@
 package com.srt.CRMBackend.repositories.tasks;
 
+import com.srt.CRMBackend.models.Company;
 import com.srt.CRMBackend.models.tasks.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,7 +14,8 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     @Query("""
         SELECT t FROM Task t
         JOIN FETCH t.taskCategory
-        JOIN FETCH t.project
+        JOIN FETCH t.project p
+        WHERE p.company = :company
     """)
-    List<Task> findAllWithCategoryAndProject();
+    List<Task> findAllWithCategoryAndProjectByCompany(Company company);
 }

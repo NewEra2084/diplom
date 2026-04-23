@@ -12,4 +12,5 @@ public interface ProjectService {
     void update(UpdateProjectRequest request);
     void delete(UUID id);
     List<ProjectResponse> getAll();
+    List<ProjectResponse> getAllWithTasks();
 }

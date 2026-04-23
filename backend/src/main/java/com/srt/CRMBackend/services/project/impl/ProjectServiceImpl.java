@@ -6,12 +6,15 @@ import com.srt.CRMBackend.DTO.project.ProjectResponse;
 import com.srt.CRMBackend.DTO.project.UpdateProjectRequest;
 import com.srt.CRMBackend.exceptions.CrmBadRequestException;
 import com.srt.CRMBackend.mappers.ProjectMapper;
+import com.srt.CRMBackend.models.Company;
 import com.srt.CRMBackend.models.employees.Employee;
 import com.srt.CRMBackend.models.tasks.Project;
+import com.srt.CRMBackend.models.tasks.TaskStatus;
 import com.srt.CRMBackend.repositories.tasks.ProjectRepository;
+import com.srt.CRMBackend.services.company.domain.CompanyDomainService;
 import com.srt.CRMBackend.services.employee.domain.EmployeeDomainService;
 import com.srt.CRMBackend.services.project.ProjectService;
-import jakarta.transaction.Transactional;
+import com.srt.CRMBackend.util.AuthHelperUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,18 +28,26 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectMapper projectMapper;
 
     private final EmployeeDomainService employeeDomainService;
+    private final CompanyDomainService companyDomainService;
+    private final AuthHelperUtil authHelperUtil;
 
     @Override
     public void create(AddProjectRequest request) {
-        if (repository.existsByName(request.getName())) {
+        if (repository.existsByNameAndCompany(request.getName(), companyDomainService.getCompanyReference())) {
             throw new CrmBadRequestException("such name already taken");
         }
-        Employee manager = employeeDomainService.getReferenceIfExistsByIdAndRole(
+
+        Company company = companyDomainService.getCompanyReference();
+        Employee manager = employeeDomainService.getReferenceIfExistsByIdAndRoleAndCompany(
                 request.getManagerId(),
-                RoleEnum.ROLE_MANAGER
+                RoleEnum.ROLE_MANAGER,
+                company
         );
+
         Project project = projectMapper.toEntity(request);
         project.setManager(manager);
+        project.setCompany(company);
+
         repository.save(project);
     }
 
@@ -44,13 +55,21 @@ public class ProjectServiceImpl implements ProjectService {
     public void update(UpdateProjectRequest request) {
         Project project = repository.findById(request.getId())
                 .orElseThrow(() -> new CrmBadRequestException("such project not found"));
-        if (repository.existsByName(request.getName())) {
+
+        if (repository.existsByNameAndCompany(request.getName(), companyDomainService.getCompanyReference())) {
             throw new CrmBadRequestException("such name already taken");
         }
-        Employee manager = employeeDomainService.getReferenceIfExistsById(request.getManagerId());
+
+        Employee manager = employeeDomainService.getReferenceIfExistsByIdAndRoleAndCompany(
+                request.getManagerId(),
+                RoleEnum.ROLE_MANAGER,
+                companyDomainService.getCompanyReference()
+        );
+
         project.setName(request.getName());
         project.setDescription(request.getDescription());
         project.setManager(manager);
+
         repository.save(project);
     }
 
@@ -63,7 +82,19 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<ProjectResponse> getAll() {
-        return repository.findAll().stream()
+        return repository.findAllByCompany(companyDomainService.getCompanyReference()).stream()
+                .map(projectMapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    public List<ProjectResponse> getAllWithTasks() {
+        if (authHelperUtil.hasRole(RoleEnum.ROLE_EMPLOYEE)) {
+            return repository.findAllWithTasksAndCategoriesByCompanyAndTasks_status(companyDomainService.getCompanyReference(), TaskStatus.FREE).stream()
+                    .map(projectMapper::toResponse)
+                    .toList();
+        }
+        return repository.findAllWithTasksAndCategoriesByCompany(companyDomainService.getCompanyReference()).stream()
                 .map(projectMapper::toResponse)
                 .toList();
     }
