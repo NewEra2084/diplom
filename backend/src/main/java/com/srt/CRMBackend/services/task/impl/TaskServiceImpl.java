@@ -1,12 +1,10 @@
 package com.srt.CRMBackend.services.task.impl;
 
-import com.srt.CRMBackend.DTO.task.TaskCategoryRequest;
-import com.srt.CRMBackend.DTO.task.TaskRequest;
-import com.srt.CRMBackend.DTO.task.TaskCategoryDTO;
-import com.srt.CRMBackend.DTO.task.TaskResponse;
+import com.srt.CRMBackend.DTO.task.*;
 import com.srt.CRMBackend.auth.UserDetailsImpl;
 import com.srt.CRMBackend.exceptions.CrmBadRequestException;
 import com.srt.CRMBackend.mappers.ProjectMapper;
+import com.srt.CRMBackend.models.Company;
 import com.srt.CRMBackend.models.employees.Role;
 import com.srt.CRMBackend.models.tasks.Project;
 import com.srt.CRMBackend.models.tasks.Task;
@@ -15,6 +13,7 @@ import com.srt.CRMBackend.models.tasks.TaskStatus;
 import com.srt.CRMBackend.repositories.tasks.ProjectRepository;
 import com.srt.CRMBackend.repositories.tasks.TaskRepository;
 import com.srt.CRMBackend.repositories.tasks.TaskCategoryRepository;
+import com.srt.CRMBackend.services.company.domain.CompanyDomainService;
 import com.srt.CRMBackend.services.task.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,8 +29,10 @@ import java.time.LocalDateTime;
 public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
     private final TaskCategoryRepository taskCategoryRepository;
+
     private final ProjectRepository projectRepository;
     private final ProjectMapper projectMapper;
+    private final CompanyDomainService companyDomainService;
 
     @Override
     public void addTask(TaskRequest request) {
@@ -39,9 +40,17 @@ public class TaskServiceImpl implements TaskService {
                 .findById(request.getTaskCategoryId())
                 .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор категории задачи"));
 
+        if (!companyDomainService.compareByCurrent(taskCategory.getCompany())) {
+            throw new CrmBadRequestException("идентификатор категории задачи пренадлежит не данной компании");
+        }
+
         Project project = projectRepository
                 .findById(request.getProjectId())
                 .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор проекта"));
+
+        if (!companyDomainService.compareByCurrent(project.getCompany())) {
+            throw new CrmBadRequestException("идентификатор проекта пренадлежит не данной компании");
+        }
 
         Task task = Task.builder()
                 .name(request.getName())
@@ -62,14 +71,48 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    public void updateTask(UpdateTaskRequest request) {
+        Task task = taskRepository.findById(request.getId())
+                .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор задачи"));
+
+        TaskCategory taskCategory = taskCategoryRepository
+                .findById(request.getTaskCategoryId())
+                .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор категории задачи"));
+
+        if (!companyDomainService.compareByCurrent(taskCategory.getCompany())) {
+            throw new CrmBadRequestException("идентификатор категории задачи пренадлежит не данной компании");
+        }
+
+        Project project = projectRepository
+                .findById(request.getProjectId())
+                .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор проекта"));
+
+        if (!companyDomainService.compareByCurrent(project.getCompany())) {
+            throw new CrmBadRequestException("идентификатор проекта пренадлежит не данной компании");
+        }
+
+        task.setName(request.getName());
+        task.setDescription(request.getDescription());
+        task.setNumberOfPoints(request.getNumberOfPoints());
+        task.setDeadline(request.getDeadline());
+        task.setPublicationTime(LocalDateTime.now());
+        task.setTaskCategory(taskCategory);
+        task.setProject(project);
+
+        taskRepository.save(task);
+    }
+
+    @Override
     public void addTaskCategory(TaskCategoryRequest request) {
-        if (taskCategoryRepository.existsByName(request.getName())) {
+        Company company = companyDomainService.getCompanyReference();
+        if (taskCategoryRepository.existsByNameAndCompany(request.getName(), company)) {
             throw new CrmBadRequestException("некорректное имя категории");
         }
 
         TaskCategory taskCategory = TaskCategory.builder()
                 .name(request.getName())
                 .description(request.getDescription())
+                .company(company)
                 .build();
 
         taskCategoryRepository.save(taskCategory);
@@ -77,7 +120,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<TaskCategoryDTO> getAllTaskCategories() {
-        return taskCategoryRepository.findAll().stream()
+        return taskCategoryRepository.findAllByCompany(companyDomainService.getCompanyReference()).stream()
                 .map(c -> TaskCategoryDTO.builder()
                         .id(c.getId())
                         .name(c.getName())
@@ -87,7 +130,8 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<TaskResponse> getAllTasks() {
-        return taskRepository.findAllWithCategoryAndProject().stream()
+        return taskRepository.findAllWithCategoryAndProjectByCompany(companyDomainService.getCompanyReference())
+                .stream()
                 .filter(this::isPrivateTask)
                 .map(t -> TaskResponse.builder()
                         .id(t.getId())

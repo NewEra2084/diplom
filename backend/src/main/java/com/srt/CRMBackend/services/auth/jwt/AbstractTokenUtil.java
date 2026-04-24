@@ -22,7 +22,8 @@ public abstract class AbstractTokenUtil {
                 "email", employee.getEmail(),
                 "firstName", fullName.getFirstName(),
                 "lastName", fullName.getLastName(),
-                "patronymic", fullName.getPatronymic()
+                "patronymic", fullName.getPatronymic(),
+                "company", employee.getCompany().getId().toString()
         );
 
         return Jwts.builder()

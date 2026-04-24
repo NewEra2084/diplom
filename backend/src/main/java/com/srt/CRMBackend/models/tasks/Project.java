@@ -1,9 +1,11 @@
 package com.srt.CRMBackend.models.tasks;
 
+import com.srt.CRMBackend.models.Company;
 import com.srt.CRMBackend.models.employees.Employee;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -27,4 +29,11 @@ public class Project {
     @ManyToOne
     @JoinColumn(name = "manager_id")
     private Employee manager;
+
+    @ManyToOne
+    @JoinColumn(name = "company_id")
+    private Company company;
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Task> tasks;
 }

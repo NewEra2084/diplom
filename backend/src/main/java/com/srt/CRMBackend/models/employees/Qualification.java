@@ -19,9 +19,10 @@ public class Qualification {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column(nullable = false)
     private String name;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "job_title_id")
     private JobTitle jobTitle;
 }

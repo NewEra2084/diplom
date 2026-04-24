@@ -19,8 +19,12 @@ public class FullName {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column(nullable = false)
     private String firstName;
+
+    @Column(nullable = false)
     private String lastName;
+
     private String patronymic;
 
     public FullName(String firstName, String lastName, String patronymic) {

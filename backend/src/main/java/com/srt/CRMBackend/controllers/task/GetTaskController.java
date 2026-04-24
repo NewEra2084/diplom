@@ -19,7 +19,7 @@ import java.util.List;
 public class GetTaskController {
     private final TaskService taskService;
 
-    @Operation(description = "менеджеры и админы получают все задачи, при этом сотрудники только свободные")
+    @Operation(description = "[Deprecated, используй project/get/with_tasks] менеджеры и админы получают все задачи, при этом сотрудники только свободные")
     @GetMapping
     public List<TaskResponse> getAllTasks() {
         return taskService.getAllTasks();

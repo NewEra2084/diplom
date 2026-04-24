@@ -14,12 +14,14 @@ import com.srt.CRMBackend.repositories.CompanyRepository;
 import com.srt.CRMBackend.repositories.employee.EmployeeRepository;
 import com.srt.CRMBackend.repositories.employee.RoleRepository;
 import com.srt.CRMBackend.services.company.CompanyService;
+import com.srt.CRMBackend.services.company.domain.CompanyDomainService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +33,7 @@ import java.util.UUID;
 public class CompanyServiceImpl implements CompanyService {
     private final CompanyRepository repository;
     private final CompanyMapper mapper;
+    private final CompanyDomainService domainService;
 
     private final EmployeeMapper employeeMapper;
     private final EmployeeRepository employeeRepository;
@@ -41,16 +44,16 @@ public class CompanyServiceImpl implements CompanyService {
     public void create(CreateCompanyRequest request) {
         validateCreateCompany(request);
 
+        Company company = mapper.toEntity(request);
+        repository.save(company);
+
         Employee admin = employeeMapper.toEntity(request.getAdmin());
         admin.setPassword(passwordEncoder.encode(admin.getPassword()));
         admin.setFullName(employeeMapper.toFullName(request.getAdmin()));
-        admin.setFullName(employeeMapper.toFullName(request.getAdmin()));
         admin.setRoles(Set.of(roleRepository.getByName("ROLE_ADMIN")));
-        employeeRepository.save(admin);
+        admin.setCompany(company);
 
-        Company company = mapper.toEntity(request);
-        company.setCreator(admin);
-        repository.save(company);
+        employeeRepository.save(admin);
     }
 
     @Override
@@ -58,10 +61,10 @@ public class CompanyServiceImpl implements CompanyService {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
 
-        Company company = getById(request.getId());
-        if (!userDetails.getEmployee().getId()
-                .equals(company.getCreator().getId())) {
-            throw new CrmBadRequestException("пользователь не является создателем");
+        Company company = domainService.getById(request.getId());
+        if (!userDetails.getEmployee().getCompany().getId()
+                .equals(company.getId())) {
+            throw new CrmBadRequestException("пользователь не является администратором данной компании");
         }
         if (repository.existsByName(request.getName())) {
             throw new CrmBadRequestException("данное название уже занято");
@@ -74,14 +77,9 @@ public class CompanyServiceImpl implements CompanyService {
         repository.save(company);
     }
 
-    private Company getById(UUID id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new CrmBadRequestException("данная комнапия не найдена"));
-    }
-
     private void validateCreateCompany(CreateCompanyRequest request) {
         Map<String, String> errors = new HashMap<>();
-        if (ChronoUnit.DAYS.between(request.getSubscribeFireDate(), Instant.now()) > 1) {
+        if (ChronoUnit.DAYS.between(request.getSubscribeFireDate(), LocalDate.now()) > 1) {
             errors.put("subscribeFireDate", "дата окончания подписки должна быть минимум до следующего дня");
         }
         if (repository.existsByName(request.getName())) {

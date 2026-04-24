@@ -20,7 +20,9 @@ public class Request {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    private boolean isAccepted;
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean isAccepted = false;
 
     @ManyToOne
     @JoinColumn(name = "task_id")

@@ -1,6 +1,5 @@
 package com.srt.CRMBackend.repositories.tasks;
 
-import com.srt.CRMBackend.models.employees.Employee;
 import com.srt.CRMBackend.models.tasks.Request;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

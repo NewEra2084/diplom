@@ -6,6 +6,7 @@ import com.srt.CRMBackend.exceptions.CrmBadRequestException;
 import com.srt.CRMBackend.models.employees.*;
 import com.srt.CRMBackend.repositories.employee.EmployeeRepository;
 import com.srt.CRMBackend.repositories.employee.PointRepository;
+import com.srt.CRMBackend.services.company.domain.CompanyDomainService;
 import com.srt.CRMBackend.services.employee.EmployeeService;
 import com.srt.CRMBackend.util.FileStorageUtil;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final PointRepository pointRepository;
     private final FileStorageUtil fileStorageUtil;
+    private final CompanyDomainService companyDomainService;
 
     @Override
     public EmployeeDTO getEmployeeData() {
@@ -39,7 +41,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public List<EmployeeDTO> getAllEmployees() {
-        List<Employee> employees = employeeRepository.findAllWithRolesAndQualificationAndJobTitle();
+        List<Employee> employees = employeeRepository.findAllByCompanyWithRolesAndQualificationAndJobTitle(
+                companyDomainService.getCompanyReference());
         return employees.stream().map(this::toEmployeeDTO)
                 .toList();
     }

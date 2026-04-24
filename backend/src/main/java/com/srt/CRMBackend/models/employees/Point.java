@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -20,12 +20,14 @@ public class Point {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column(nullable = false)
     private int total;
 
-    @Temporal(TemporalType.DATE)
-    private Date lastUpdate;
+    @Builder.Default
+    @Column(nullable = false)
+    private LocalDate lastUpdate = LocalDate.now();
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, optional = false)
     @JoinColumn(name = "employee_id")
     private Employee employee;
 }

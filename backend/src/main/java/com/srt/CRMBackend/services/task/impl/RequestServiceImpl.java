@@ -88,6 +88,5 @@ public class RequestServiceImpl implements RequestService {
                             .total(0).build())
                 );
         point.setTotal(point.getTotal() + task.getNumberOfPoints());
-        point.setLastUpdate(Date.from(Instant.now()));
     }
 }

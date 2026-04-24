@@ -27,7 +27,6 @@ public class AddEmployeeRequest {
     @NotBlank
     private String patronymic;
 
-    @NotNull
     private UUID qualificationId;
 
     @NotBlank

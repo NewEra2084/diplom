@@ -1,13 +1,14 @@
 package com.srt.CRMBackend.auth;
 
 import com.srt.CRMBackend.models.employees.Employee;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.UUID;
 
+@Getter
 @RequiredArgsConstructor
 public class UserDetailsImpl implements UserDetails {
     private final Employee employee;
@@ -27,7 +28,4 @@ public class UserDetailsImpl implements UserDetails {
         return employee.getLogin();
     }
 
-    public Employee getEmployee() {
-        return employee;
-    }
 }

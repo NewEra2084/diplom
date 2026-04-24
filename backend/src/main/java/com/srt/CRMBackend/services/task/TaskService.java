@@ -1,9 +1,6 @@
 package com.srt.CRMBackend.services.task;
 
-import com.srt.CRMBackend.DTO.task.TaskCategoryRequest;
-import com.srt.CRMBackend.DTO.task.TaskRequest;
-import com.srt.CRMBackend.DTO.task.TaskCategoryDTO;
-import com.srt.CRMBackend.DTO.task.TaskResponse;
+import com.srt.CRMBackend.DTO.task.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -11,6 +8,7 @@ import java.util.UUID;
 public interface TaskService {
     void addTask(TaskRequest request);
     void deleteTask(UUID taskId);
+    void updateTask(UpdateTaskRequest request);
 
     void addTaskCategory(TaskCategoryRequest request);
 

@@ -45,7 +45,7 @@ public class EmployeeTaskServiceImpl implements EmployeeTaskService {
         taskExecutionRequestRepository.save(taskExecutionRequest);
 
         Task task = taskRepository.findById(taskId).orElseThrow(RuntimeException::new);
-        task.setStatus(TaskStatus.IN_PROGRESS);
+        task.setStatus(TaskStatus.ACTIVE);
     }
 
     @Override

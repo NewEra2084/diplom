@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -24,7 +23,6 @@ public class UpdateEmployeeRequest {
     @NotBlank
     private String patronymic;
 
-    @NotNull
     private UUID qualificationId;
 
     @NotBlank

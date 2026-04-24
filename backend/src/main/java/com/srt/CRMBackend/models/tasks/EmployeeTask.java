@@ -23,14 +23,15 @@ public class EmployeeTask {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "employee_id")
     private Employee employee;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "task_id")
     private Task task;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ExecutionStatus executionStatus = ExecutionStatus.IN_PROGRESS;
 }

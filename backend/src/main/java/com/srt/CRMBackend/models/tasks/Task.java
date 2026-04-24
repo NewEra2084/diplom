@@ -21,24 +21,32 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column(nullable = false)
     private String name;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String description;
 
+    @Column(nullable = false)
     private int numberOfPoints;
 
+    @Column(nullable = false)
     private LocalDate deadline;
-    private LocalDateTime publicationTime;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private LocalDateTime publicationTime = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
-    private TaskStatus status;
+    @Column(nullable = false)
+    @Builder.Default
+    private TaskStatus status = TaskStatus.FREE;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "task_category_id")
     private TaskCategory taskCategory;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "project_id")
     private Project project;
 

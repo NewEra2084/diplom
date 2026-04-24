@@ -14,4 +14,5 @@ public class AddQualificationRequest {
     private UUID jobTitleId;
     @NotBlank
     private String qualificationName;
+
 }
