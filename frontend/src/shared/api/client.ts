@@ -15,23 +15,22 @@ api.interceptors.request.use(async (config) => {
   }
   if (token && Date.now() / 1000 > jwtDecode(token).exp!) {
       try {
-        console.log("start");
         const refresh = await postTemplate("/auth/update_tokens", {
           refreshToken: tokenRefresh,
         });
-        console.log("got");
+        console.log(refresh);
         token = refresh.data.accessToken;
         localStorage.setItem("accessToken", refresh.data.accessToken);
         localStorage.setItem("refreshToken", refresh.data.refreshToken);
         console.log("end");
-      } catch(error) {
+      } catch(error) {        
         window.location.href = "/auth";
         return Promise.reject(error);
       }
     }else if(token){
       config.headers.Authorization = `Bearer ${token}`;
     }
-  return config;
+    return config;
 });
 
 api.interceptors.response.use(
@@ -50,9 +49,11 @@ const postTemplate = async (
   try {
     const { data, status } = await api.post(url, info, {
       headers: {
-        "Content-Type": contentType,
+        "Content-Type": contentType
       },
     });
+    console.log(data);
+    
     return { data: data, status: status };
   } catch (error) {
     throw error;

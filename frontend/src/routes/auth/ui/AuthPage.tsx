@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { auth } from "../lib/endpoints";
-import { postTemplate } from "@/shared/api/client";
+import { useUserStore } from "@/entities/user/model/store";
 
 type fields = {
   login: string;
@@ -15,17 +15,23 @@ export const AuthPage = () => {
     password: "",
   });
   const [error, setError] = useState<null | string>(null);
+  const fetchUser = useUserStore(store=>store.fetchUser);
 
   const handleSubmit = async () => {
     if (fields.login == null || fields.password == null) {
       setError("Не все поля заполнены");
       return;
     }
-    const response = await auth({login: fields.login, password: fields.password});    
-
-    if(response >= 400){
+    const response = await auth({
+      login: fields.login,
+      password: fields.password,
+    });
+    
+    if (response >= 400) {
       setError("Не корректные данные");
     }
+    fetchUser();
+    window.location.href = "/";
   };
 
   return (
