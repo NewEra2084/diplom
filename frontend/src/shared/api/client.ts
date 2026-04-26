@@ -18,11 +18,9 @@ api.interceptors.request.use(async (config) => {
         const refresh = await postTemplate("/auth/update_tokens", {
           refreshToken: tokenRefresh,
         });
-        console.log(refresh);
         token = refresh.data.accessToken;
         localStorage.setItem("accessToken", refresh.data.accessToken);
         localStorage.setItem("refreshToken", refresh.data.refreshToken);
-        console.log("end");
       } catch(error) {        
         // window.location.href = "/auth";
         return Promise.reject(error);

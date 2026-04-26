@@ -15,10 +15,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <body className="transition-all">
         <QueryProvider>
           <Header />
-          <main>{children}</main>
+          <main className="px-25 py-[min(10vw,50px)] h-[90vh] dark:bg-dark-main dark:text-dark-accent transition-all duration-700">{children}</main>
           <Footer />
         </QueryProvider>
       </body>
