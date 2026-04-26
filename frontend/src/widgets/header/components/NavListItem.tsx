@@ -2,6 +2,7 @@
 import { User } from "@/entities/user/types";
 import { Column } from "./Navigation";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 
 type Props = {
   userData: User;
@@ -34,15 +35,15 @@ NavListItem.Profile = function Profile({ logout }: ProfileProps) {
   return (
     <ul className="lg:absolute top-20 text-lg text-accent lg:text-main divide-x-2 lg:divide-none left-0 mt-2 w-full flex flex-wrap gap-4 lg:flex-col lg:py-2 lg:items-center lg:rounded-xl lg:bg-secondary lg:dark:bg-dark-secondary lg:border-4 lg:border-accent/50 lg:hover:border-accent/30">
       <li className="hover:bg-accent pr-3 lg:hover:bg-accent/30 lg:py-2 lg:px-5 lg:rounded-lg">
-        <a href={"/profile"}>{t('profile')}</a>
+        <Link href={"/profile"}>{t('profile')}</Link>
       </li>
       <li className="hover:bg-accent pr-3 lg:hover:bg-accent/30 lg:py-2 lg:px-5 lg:rounded-lg">
-        <a href={"/settings"}>{t('settings')}</a>
+        <Link href={"/settings"}>{t('settings')}</Link>
       </li>
       <li className="hover:bg-accent pr-3 lg:hover:bg-accent/30 lg:py-2 lg:px-5 lg:rounded-lg">
-        <a onClick={logout} href={"/auth"}>
+        <Link onClick={logout} href={"/auth"}>
           {t('logout')}
-        </a>
+        </Link>
       </li>
     </ul>
   );

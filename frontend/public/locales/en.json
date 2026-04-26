@@ -16,5 +16,11 @@
   },
   "HomePage":{
     "title": "Scrumify"
+  },
+  "SettingsPage":{
+    "languages":{
+      "en":"English",
+      "ru":"Russian"
+    }
   }
 }

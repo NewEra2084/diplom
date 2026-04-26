@@ -1,23 +1,9 @@
 "use client";
-import { useEffect } from "react";
 import { useTheme } from "../model/use-theme";
-
 import { Moon, Sun, SunMoon } from "lucide-react";
 
 export const ThemeSwitcher = ({className} : {className:string}) => {
   const { theme, switchTheme } = useTheme();
-  useEffect(() => {
-    if (localStorage.getItem("theme") == null) {
-      localStorage.setItem(
-        "theme",
-        JSON.stringify({ state: { theme: "light" } }),
-      );
-    }
-    const c = JSON.parse(localStorage.getItem("theme")!)["state"]["theme"];
-    if (c === "dark") {
-      document.documentElement.classList.add("dark");
-    }
-  }, []);
   
   return (
     <ul className={`flex justify-between ${className}`}>

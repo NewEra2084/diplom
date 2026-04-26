@@ -4,7 +4,6 @@ import { persist } from "zustand/middleware";
 interface ThemeState {
   theme: "light" | "dark";
   switchTheme: (variant: "dark" | "light" | "system") => void;
-  getTheme: () => "light" | "dark";
 }
 
 export const getSystemTheme = () => {
@@ -18,27 +17,34 @@ export const useTheme = create<ThemeState>()(
     (set, get) => ({
       theme: "light",
       switchTheme: (variant) => {
-        if (get().theme === variant) {
+        let newTheme: "light" | "dark";
+        if(variant === get().theme){
           return;
         }
+
         if (variant === "system") {
-          set(() => ({
-            theme: getSystemTheme(),
-          }));
+          newTheme = getSystemTheme();
         } else {
-          set(() => ({
-            theme: variant,
-          }));
+          newTheme = variant;
         }
 
-        if (get().theme === "dark") {
+        // Обновляем DOM сразу
+        if (newTheme === "dark") {
           document.documentElement.classList.add("dark");
         } else {
           document.documentElement.classList.remove("dark");
         }
+
+        set({ theme: newTheme });
+
+        (async () => {
+          const { setThemeCookie } = await import("../ui/SetThemeCookie");
+          await setThemeCookie(newTheme);
+        })();
       },
-      getTheme: () => get().theme,
     }),
-    { name: "theme" },
+    {
+      name: "theme-storage", // ключ для localStorage (fallback если не куки)
+    },
   ),
 );

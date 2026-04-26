@@ -1,12 +1,13 @@
 "use server";
-import { hasLocale } from "next-intl";
+import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { Header } from "@/widgets/header";
 import { Footer } from "@/widgets/footer";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { cookies } from "next/headers";
 import { ThemeInitializer } from "@/features/theme";
-import { setThemeCookie } from "@/features/theme/ui/SetThemeCookie";
+import { QueryProvider } from "../providers/QueryProvider";
+import { getMessages } from "next-intl/server";
 
 export default async function LocaleLayout({
   children,
@@ -16,24 +17,23 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>;
 }) {
   const store = await cookies();
-  const theme = store.get("theme")?.value;
+  const theme = store.get("theme")?.value as "light" | "dark";
   const { locale } = await params;
+  const messages = await getMessages({ locale });
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
-  if(!theme){
-
-    setThemeCookie("light");
-  }
 
   return (
-    <>
-      <ThemeInitializer theme={theme} />
-      <Header />
-      <main className="px-25 py-[min(10vw,50px)] h-[90vh] dark:bg-dark-main dark:text-dark-accent transition-all duration-700">
-        {children}
-      </main>
-      <Footer />
-    </>
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      <QueryProvider>
+        <ThemeInitializer serverTheme={theme} />
+        <Header />
+        <main className="px-25 py-[min(10vw,50px)] h-[90vh] dark:bg-dark-main dark:text-dark-accent transition-all duration-700">
+          {children}
+        </main>
+        <Footer />
+      </QueryProvider>
+    </NextIntlClientProvider>
   );
 }

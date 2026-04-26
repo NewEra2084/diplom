@@ -1,3 +1,4 @@
+import { LocaleSwitcher } from "@/features/language/LanguageSwitcher";
 import { ThemeSwitcher } from "@/features/theme";
 import { Aside } from "@/widgets/aside/Aside";
 import { AsideElement } from "@/widgets/aside/components/AsideElement";
@@ -13,16 +14,8 @@ export const SettingsPage = () => {
   const [index, setIndex] = useState(0);
   return (
     <div className="flex h-full gap-3">
-      <Aside title="Настройки">
-        {elements.map((item) => (
-          <AsideElement
-            onClick={() => setIndex(item.id)}
-            key={item.id}
-            className={`${item.id === index ? "bg-accent hover:bg-none" : "hover:bg-accent/70"}`}
-          >
-            {item.name}
-          </AsideElement>
-        ))}
+      <Aside title="Настройки" elements={elements} currentIndex={index} elementOnClick={(id) => setIndex(id)}>
+        
       </Aside>
       <Body title={elements[index].name}>
         {index === 0 && (
@@ -35,10 +28,7 @@ export const SettingsPage = () => {
         )}
         {index === 1 && (
           <div className="px-14 text-lg">
-            <div>
-              Язык
-              
-            </div>
+            <LocaleSwitcher/>
           </div>
         )}
       </Body>

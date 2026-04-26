@@ -56,15 +56,15 @@ export const columns: Column[] = [
 
 export const Navigation = ({ className }: Props) => {
   const userData = useUserStore((store) => store.user);
+  const fetchUsers = useUserStore((user) => user.fetchUser);
   const t = useTranslations('Header');
-  const [_,b] = useState<User | null>();
   const logout = useUserStore((store) => store.logout);
   // Храним только ID открытого пункта, а не массив статусов
   const [openItemId, setOpenItemId] = useState<string | null>(null);
 
   useEffect(()=>{
-    b(userData);
-  },[userData])
+    fetchUsers();
+  },[fetchUsers])
 
   const toggleItem = (title: string) => {
     setOpenItemId((prev) => (prev === title ? null : title));

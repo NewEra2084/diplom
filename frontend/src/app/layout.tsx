@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { QueryProvider } from "./providers/QueryProvider";
-import { NextIntlClientProvider } from "next-intl";
 export const metadata: Metadata = {
   title: "Scrumify",
   description: "The scrum management tool",
@@ -14,11 +12,7 @@ export default function RootLayout({
 }>) {
   return (
     <html>
-      <body className="transition-all">
-        <QueryProvider>
-          <NextIntlClientProvider>{children}</NextIntlClientProvider>
-        </QueryProvider>
-      </body>
+      <body className="transition-all">{children}</body>
     </html>
   );
 }
