@@ -29,7 +29,9 @@ export const AuthPage = () => {
     
     if (response >= 400) {
       setError("Не корректные данные");
+      return;
     }
+
     fetchUser();
     window.location.href = "/";
   };

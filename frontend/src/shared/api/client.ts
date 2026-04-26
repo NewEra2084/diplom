@@ -24,7 +24,7 @@ api.interceptors.request.use(async (config) => {
         localStorage.setItem("refreshToken", refresh.data.refreshToken);
         console.log("end");
       } catch(error) {        
-        window.location.href = "/auth";
+        // window.location.href = "/auth";
         return Promise.reject(error);
       }
     }else if(token){
@@ -52,7 +52,6 @@ const postTemplate = async (
         "Content-Type": contentType
       },
     });
-    console.log(data);
     
     return { data: data, status: status };
   } catch (error) {
