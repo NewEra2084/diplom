@@ -3,6 +3,7 @@ import { roles, User } from "@/entities/user/types";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { NavListItem } from "./NavListItem";
+import { useTranslations } from "next-intl";
 
 export type Props = {
   className?: string;
@@ -16,38 +17,38 @@ export type Column = {
 
 export const columns: Column[] = [
   {
-    title: "Задачи",
+    title: "tasks",
     pages: [
-      { path: "/MyTasks", name: "Мои задачи", roles: ["ROLE_EMPLOYEE"] },
+      { path: "/MyTasks", name: "my tasks", roles: ["ROLE_EMPLOYEE"] },
       {
         path: "/AllTasks",
-        name: "Все задачи",
+        name: "all tasks",
         roles: ["ROLE_EMPLOYEE", "ROLE_MANAGER"],
       },
     ],
     roles: ["ROLE_EMPLOYEE", "ROLE_MANAGER"],
   },
   {
-    title: "Проекты",
+    title: "projects",
     pages: [
       {
         path: "/MyProjects",
-        name: "Мои проекты",
+        name: "my projects",
         roles: ["ROLE_EMPLOYEE", "ROLE_MANAGER"],
       },
-      { path: "/AllProjects", name: "Все проекты", roles: ["ROLE_MANAGER"] },
+      { path: "/AllProjects", name: "all projects", roles: ["ROLE_MANAGER"] },
     ],
     roles: ["ROLE_EMPLOYEE", "ROLE_MANAGER"],
   },
   {
-    title: "Панель управления",
+    title: "panel",
     pages: [
       {
         path: "/ManagerPanel",
-        name: "Менеджер панель",
+        name: "manager",
         roles: ["ROLE_MANAGER", "ROLE_ADMIN"],
       },
-      { path: "/AdminPanel", name: "Админ панель", roles: ["ROLE_ADMIN"] },
+      { path: "/AdminPanel", name: "admin", roles: ["ROLE_ADMIN"] },
     ],
     roles: ["ROLE_MANAGER", "ROLE_ADMIN"],
   },
@@ -55,7 +56,8 @@ export const columns: Column[] = [
 
 export const Navigation = ({ className }: Props) => {
   const userData = useUserStore((store) => store.user);
-  const [a,b] = useState<User | null>();
+  const t = useTranslations('Header');
+  const [_,b] = useState<User | null>();
   const logout = useUserStore((store) => store.logout);
   // Храним только ID открытого пункта, а не массив статусов
   const [openItemId, setOpenItemId] = useState<string | null>(null);
@@ -78,10 +80,10 @@ export const Navigation = ({ className }: Props) => {
               <li
                 className="relative p-5 hover:bg-accent/50 cursor-pointer"
                 key={idx}
-                onClick={() => toggleItem(item.title)}
+                onClick={() => toggleItem(t(item.title))}
               >
-                {item.title}
-                {openItemId === item.title && (
+                {t(item.title)}
+                {openItemId === t(item.title) && (
                   <NavListItem userData={userData} item={item} />
                 )}
               </li>
@@ -90,11 +92,11 @@ export const Navigation = ({ className }: Props) => {
       </ul>
       <div
         className="p-5 relative ml-auto"
-        onClick={() => userData && toggleItem("Профиль")}
+        onClick={() => userData && toggleItem(t('profile'))}
       >
-        {!userData && <Link href={"/auth"}>Войти</Link>}
-        {userData && <h4>{"Профиль: " +userData?.firstName + " " + userData?.lastName}</h4>}
-        {openItemId === "Профиль" && <NavListItem.Profile logout={logout} />}
+        {!userData && <Link href={"/auth"}>{t('enter')}</Link>}
+        {userData && <h4>{t('profile')+ ": " +userData?.firstName + " " + userData?.lastName}</h4>}
+        {openItemId === t('profile') && <NavListItem.Profile logout={logout} />}
       </div>
     </nav>
   );

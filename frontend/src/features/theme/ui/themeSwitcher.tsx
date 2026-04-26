@@ -18,7 +18,6 @@ export const ThemeSwitcher = ({className} : {className:string}) => {
       document.documentElement.classList.add("dark");
     }
   }, []);
-  console.log(theme);
   
   return (
     <ul className={`flex justify-between ${className}`}>

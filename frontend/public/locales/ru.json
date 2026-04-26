@@ -1,0 +1,20 @@
+{
+  "Header":{
+    "profile": "Профиль",
+    "enter": "Вход",
+    "panel": "Панель управления",
+    "tasks": "Задачи",
+    "projects":"Проекты",
+    "my tasks":"Мои задачи",
+    "all tasks":"Все задачи",
+    "all projects":"Все проекты",
+    "my projects":"Мои проекты",
+    "manager":"Менеджер панель",
+    "admin":"Админ панель",
+    "logout":"Выход",
+    "settings": "Настройки"
+  },
+  "HomePage":{
+    "title": "Скрумифай"
+  }
+}

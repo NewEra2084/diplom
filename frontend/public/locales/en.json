@@ -1,0 +1,20 @@
+{
+  "Header":{
+    "profile": "Profile",
+    "enter": "Enter",
+    "panel": "Handle panel",
+    "tasks": "Tasks",
+    "projects":"Projects",
+    "my tasks":"My tasks",
+    "all tasks":"All tasks",
+    "all projects":"All projects",
+    "my projects":"My projects",
+    "manager":"Manager",
+    "admin":"Admin",
+    "logout": "Logout",
+    "settings": "Settings"
+  },
+  "HomePage":{
+    "title": "Scrumify"
+  }
+}

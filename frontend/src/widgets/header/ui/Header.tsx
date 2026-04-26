@@ -15,7 +15,9 @@ export const Header = ({}) => {
   }, [fetchUsers]);
   return (
     <header className="relative hover:shadow-lg select-none py-2 lg:p-0 text-lg shadow-secondary flex justify-between lg:justify-normal items-center bg-secondary dark:bg-dark-secondary text-main dark:text-dark-main lg:px-20 px-10">
-      <Logo />
+      <a href="/">
+        <Logo />
+      </a>
       <Navigation className="mx-auto hidden lg:flex" />
       {!isOpen.is && (
         <Menu

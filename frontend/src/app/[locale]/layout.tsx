@@ -1,36 +1,39 @@
-import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
-import type { Metadata } from "next";
-import "../globals.css";
+"use server";
+import { hasLocale } from "next-intl";
 import { Header } from "@/widgets/header";
 import { Footer } from "@/widgets/footer";
-import { QueryProvider } from "../providers/QueryProvider";
-export const metadata: Metadata = {
-  title: "Scrumify",
-  description: "The scrum management tool",
-};
+import { notFound } from "next/navigation";
+import { routing } from "@/i18n/routing";
+import { cookies } from "next/headers";
+import { ThemeInitializer } from "@/features/theme";
+import { setThemeCookie } from "@/features/theme/ui/SetThemeCookie";
 
 export default async function LocaleLayout({
   children,
-  params: { locale },
+  params,
 }: {
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
-  const messages = await getMessages();
+  const store = await cookies();
+  const theme = store.get("theme")?.value;
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
+  if(!theme){
+
+    setThemeCookie("light");
+  }
+
   return (
-    <html lang={locale}>
-      <body className="transition-all">
-        <QueryProvider>
-          <NextIntlClientProvider messages={messages}>
-            <Header />
-            <main className="px-25 py-[min(10vw,50px)] h-[90vh] dark:bg-dark-main dark:text-dark-accent transition-all duration-700">
-              {children}
-            </main>
-            <Footer />
-          </NextIntlClientProvider>
-        </QueryProvider>
-      </body>
-    </html>
+    <>
+      <ThemeInitializer theme={theme} />
+      <Header />
+      <main className="px-25 py-[min(10vw,50px)] h-[90vh] dark:bg-dark-main dark:text-dark-accent transition-all duration-700">
+        {children}
+      </main>
+      <Footer />
+    </>
   );
 }
