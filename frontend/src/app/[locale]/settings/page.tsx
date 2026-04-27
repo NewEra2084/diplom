@@ -1,11 +1,9 @@
-"use client"
-import { useAuthGuard } from "@/features/authMiddleware/useAuthGuard";
-import { SettingsPage } from "@/routes/settings";
-import { ReactNode } from "react";
+import { redirect } from "@/i18n/navigation";
+import { useLocale } from "next-intl";
 
-export default function Page({children}:{children:ReactNode}) {
-  useAuthGuard(["ROLE_EMPLOYEE", "ROLE_ADMIN", "ROLE_MANAGER"]);
+export default function SettingsPage () {
+  redirect({href: "/settings/appearance", locale:useLocale()});
   return (
-    <SettingsPage/>
-  )
-}
+    null
+  );
+};

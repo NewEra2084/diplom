@@ -1,35 +1,32 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ReactNode, useState } from "react";
 import { AsideElement } from "./components/AsideElement";
+import { usePathname } from "next/navigation";
+import { useLocale } from "next-intl";
 
 type Props = {
   children?: ReactNode;
   title: string;
-  elementOnClick: (id: number) => void;
-  elements: { id: number; name: string }[];
-  currentIndex: number;
+  elements: { id: number; name: string; link: string }[];
 };
 
-export const Aside = ({
-  children,
-  currentIndex,
-  title,
-  elements,
-  elementOnClick,
-}: Props) => {
+export const Aside = ({ title, elements }: Props) => {
   const [isOpen, setIsOpen] = useState(true);
+  const pathname = usePathname();
+  const locale = useLocale();
+
   return (
     <div className="flex gap-3">
       {isOpen && (
         <aside
-          className={`h-full select-none p-8 rounded-xl border-2 border-secondary dark:border-dark-secondary`}
+          className={`h-full flex flex-col select-none p-8 rounded-xl border-2 border-secondary dark:border-dark-secondary`}
         >
           <h4 className="text-2xl mb-5">{title}</h4>
           {elements.map((item) => (
             <AsideElement
-              onClick={() => elementOnClick(item.id)}
               key={item.id}
-              className={`${item.id === currentIndex ? "bg-accent hover:bg-none" : "hover:bg-accent/70"}`}
+              to={item.link}
+              className={`${pathname == "/" + locale + "/settings/" + item.link ? "bg-accent hover:bg-none" : "hover:bg-accent/70"}`}
             >
               {item.name}
             </AsideElement>
