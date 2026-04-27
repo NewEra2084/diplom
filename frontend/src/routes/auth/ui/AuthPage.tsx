@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { auth } from "../lib/endpoints";
 import { useUserStore } from "@/entities/user/model/store";
+import { useRouter } from "@/i18n/navigation";
+import { FormLabelInput } from "./FormLabelInput";
 
 type fields = {
   login: string;
@@ -15,7 +17,8 @@ export const AuthPage = () => {
     password: "",
   });
   const [error, setError] = useState<null | string>(null);
-  const fetchUser = useUserStore(store=>store.fetchUser);
+  const fetchUser = useUserStore((store) => store.fetchUser);
+  const router = useRouter();
 
   const handleSubmit = async () => {
     if (fields.login == null || fields.password == null) {
@@ -26,41 +29,50 @@ export const AuthPage = () => {
       login: fields.login,
       password: fields.password,
     });
-    
+
     if (response >= 400) {
       setError("Не корректные данные");
       return;
     }
 
     fetchUser();
-    window.location.href = "/";
+    router.replace("/");
   };
 
   return (
-    <>
-      <div>{error}</div>
+    <div className="flex h-full divide-x-2">
+      <div className="hidden lg:block lg:flex-3"></div>
       <form
+        className="flex gap-10 flex-1 lg:pl-4 flex-col justify-center items-center"
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();
         }}
       >
-        <input
-          type="text"
+        <h2 className="text-3xl font-bold mb-10">Авторизация</h2>
+        <FormLabelInput
+          title="Логин"
           value={fields.login}
-          onChange={(e) =>
-            setField((prev) => ({ ...prev, login: e.target.value }))
+          onChange={(evalue) =>
+            setField((prev) => ({ ...prev, login: evalue }))
           }
         />
-        <input
-          type="text"
+        <FormLabelInput
+          title="Пароль"
           value={fields.password}
-          onChange={(e) =>
-            setField((prev) => ({ ...prev, password: e.target.value }))
+          type="password"
+          onChange={(evalue) =>
+            setField((prev) => ({ ...prev, password: evalue }))
           }
         />
-        <button type="submit">Вход</button>
+        <div className="text-accent dark:text-dark-accent">{error}</div>
+        <button
+          className="rounded-xl hover:w-full transition-all hover:animate-pulse bg-secondary text-main w-[50%] py-4"
+          type="submit"
+        >
+          Вход
+        </button>
       </form>
-    </>
+    </div>
   );
 };
