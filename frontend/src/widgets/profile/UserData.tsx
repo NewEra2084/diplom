@@ -32,10 +32,22 @@ export const UserData = ({ className, editable = true }: Props) => {
   }, [setFields, userData]);
   return (
     <section className={className}>
-      <h2 className="text-3xl">Профиль</h2>
-      <div className="flex">
-        <div className="flex-1"></div>
-        <div className="flex-2 flex flex-col gap-4 text-lg border-x-2 pt-10 relative border-accent pl-[5vw]">
+      <h2 className="text-2xl lg:text-3xl text-center mb-5 lg:mb-0 lg:text-left">Профиль</h2>
+      <div className="flex flex-col lg:flex-row">
+        <div className="flex-1 flex justify-center items-center">
+          <div className="rounded-full relative group bg-gray-500 peer w-36 h-36 lg:w-56 lg:h-56 mb-10">
+            <div className="absolute rounded-full inset-0 bg-secondary/10 hidden group-hover:flex items-center justify-center">
+              <SquarePen
+                size={45}
+                onClick={() => {
+                  setIsEdit(true);
+                  Validate();
+                }}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="flex-2 flex flex-col gap-4 text-base lg:text-lg border-x-2 pt-10 relative border-accent pl-[5vw]">
           <DataField available={true} purpose="Почта" field="email" />
           <DataField available={true} purpose="Логин" field="login" />
           <DataField available={true} purpose="Имя" field="firstName" />
@@ -43,18 +55,18 @@ export const UserData = ({ className, editable = true }: Props) => {
           <DataField available={true} purpose="Отчество" field="patronymic" />
           <DataField
             available={false}
-            purpose="Название должности"
+            purpose="Должность"
             field="jobTitleName"
           />
           <DataField
             available={false}
-            purpose="Название квалификации"
+            purpose="Квалификация"
             field="qualificationName"
           />
           <DataField
             available={false}
             type="select"
-            purpose="Роль сотрудника"
+            purpose="Роль"
             field="role"
           />
           <div className="absolute top-0 right-5">
@@ -71,11 +83,11 @@ export const UserData = ({ className, editable = true }: Props) => {
               ))}
           </div>
         </div>
-        <div className="p-4 flex flex-col justify-center items-center">
-          <span>Очки</span>
-          <div className={` text-2xl relative`}>
+        <div className="p-10 flex flex-col justify-center items-center">
+          <span className="text-lg mb-4">Очки</span>
+          <div className={`text-2xl`}>
             <div
-              className={`absolute flex justify-center items-center inset-0 rounded-full outline-8 p-10 ${points > 100 ? "outline-accent" : points > 50 ? "outline-accent/50" : "outline-accent/20"}`}
+              className={`flex justify-center items-center inset-0 rounded-full outline-8 p-10 ${points > 100 ? "outline-accent" : points > 50 ? "outline-accent/50" : "outline-accent/20"}`}
             >
               <span className="text-3xl">{points}</span>
             </div>

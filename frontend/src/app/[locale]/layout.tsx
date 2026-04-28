@@ -29,7 +29,7 @@ export default async function LocaleLayout({
       <QueryProvider>
         <ThemeInitializer serverTheme={theme} />
         <Header />
-        <main className="px-25 py-[min(10vw,50px)] h-[90vh] dark:bg-dark-main dark:text-dark-accent transition-all duration-700">
+        <main className="px-10 lg:px-25 py-[min(10vw,50px)] min-h-[90vh] dark:bg-dark-main dark:text-dark-accent transition-all duration-700">
           {children}
         </main>
         <Footer />
