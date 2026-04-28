@@ -3,6 +3,7 @@ import { ReactNode, useState } from "react";
 import { AsideElement } from "./components/AsideElement";
 import { usePathname } from "next/navigation";
 import { useLocale } from "next-intl";
+import { useLayoutState } from "@/app/store/useLayoutState";
 
 type Props = {
   children?: ReactNode;
@@ -11,13 +12,13 @@ type Props = {
 };
 
 export const Aside = ({ title, elements }: Props) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const { asideIsOpen, setAsideIsOpen} = useLayoutState();
   const pathname = usePathname();
   const locale = useLocale();
 
   return (
-    <div className="flex h-full gap-3">
-      {isOpen && (
+    <div className="flex min-h-[80vh] gap-3">
+      {asideIsOpen && (
         <aside
           className={`h-full flex flex-col select-none p-8 rounded-xl border-2 border-secondary dark:border-dark-secondary`}
         >
@@ -34,10 +35,10 @@ export const Aside = ({ title, elements }: Props) => {
         </aside>
       )}
       <div
-        onClick={() => setIsOpen((prev) => !prev)}
-        className="hover:bg-accent/50 flex items-center transition-all"
+        onClick={() => setAsideIsOpen()}
+        className="hover:bg-accent/50 hidden lg:flex items-center transition-all"
       >
-        {isOpen ? (
+        {asideIsOpen ? (
           <ChevronLeft size={30} className="mx-auto" />
         ) : (
           <ChevronRight size={30} className="mx-auto" />
