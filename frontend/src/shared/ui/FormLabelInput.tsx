@@ -15,7 +15,7 @@ export const FormLabelInput = ({
   onChange,
 }: Props) => {
   const [visible, setVisible] = useState(false);
-  const [inputState, setInputState] = useState("");
+  const [inputState, setInputState] = useState(value);
   const id = useId();
   return (
     <div className="relative w-full">

@@ -47,7 +47,7 @@ export const UserData = ({ className, editable = true }: Props) => {
             </div>
           </div>
         </div>
-        <div className="flex-2 flex flex-col gap-4 text-base lg:text-lg border-x-2 pt-10 relative border-accent pl-[5vw]">
+        <div className={`flex-2 flex flex-col ${isEdit ? "gap-10" : "gap-4"} text-base lg:text-lg border-x-2 pt-10 relative border-accent pl-[5vw]`}>
           <DataField available={true} purpose="Почта" field="email" />
           <DataField available={true} purpose="Логин" field="login" />
           <DataField available={true} purpose="Имя" field="firstName" />

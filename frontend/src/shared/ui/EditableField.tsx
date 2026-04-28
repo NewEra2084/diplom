@@ -1,4 +1,5 @@
 import { ChangeEvent } from "react";
+import { FormLabelInput } from "./FormLabelInput";
 
 type Props = {
   text: string | undefined;
@@ -19,15 +20,8 @@ export const EditableField = ({
     <div className="pl-4 pr-10 flex-2">
       {isEdit ? (
         type === "text" ? (
-          <input
-            className="w-full border-2 outline-none border-secondary rounded-xl px-2"
-            type="text"
-            value={text}
-            placeholder={purpose || "Введите текст..."}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => {
-              if (onChange) onChange(e.target.value);
-            }}
-            ></input>
+          <FormLabelInput title={purpose || ""} onChange={onChange} value={text}/>
+          
           ) : (
             <select
             className="w-full border-2 outline-none border-secondary rounded-xl px-2"

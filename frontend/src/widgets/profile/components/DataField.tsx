@@ -1,10 +1,10 @@
-import { useProfileStore } from "@/app/[locale]/profile/store/profileStore";
+import { Fields, useProfileStore } from "@/app/[locale]/profile/store/profileStore";
 import { useUserStore } from "@/entities/user/model/store";
-import { usePathname } from "@/i18n/navigation";
 import { EditableField } from "@/shared/ui/EditableField";
 
+type FieldKey = keyof Fields;
 type Props = {
-  field: string;
+  field: FieldKey;
   purpose: string;
   available: boolean;
   type?: string
@@ -15,10 +15,9 @@ export const DataField = ({ field, type, available, purpose }: Props) => {
   const isEdit = useProfileStore((state) => state.isEdit);
   const fields = useProfileStore((state) => state.fields);
   const userData = useUserStore((state) => state.user);
-  const pathName = usePathname();
   return (
     <div className="flex h-8">
-      <h5 className="flex-1">{purpose}:</h5>
+      {!isEdit && <h5 className="flex-1">{purpose}:</h5>}
       {available ? (
         <EditableField
           purpose={purpose}

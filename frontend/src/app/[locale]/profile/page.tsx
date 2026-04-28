@@ -1,5 +1,5 @@
 "use client";
-import { useAuthGuard } from "@/features/authMiddleware/useAuthGuard";
+import { useAuthGuard } from "@/features/auth/useAuthGuard";
 import { useUserStore } from "@/entities/user/model/store";
 import { useEffect } from "react";
 import { UserData } from "@/widgets/profile/UserData";
