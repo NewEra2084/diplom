@@ -38,6 +38,7 @@ public class SecurityConfig {
                         .requestMatchers("/task/get/**").authenticated()
                         .requestMatchers("/task/employee/**").authenticated()
                         .requestMatchers("/task/**").hasAnyRole(new String[] {"ADMIN", "MANAGER"})
+                        .requestMatchers("/project/get/**").authenticated()
                         .requestMatchers("/project/**").hasAnyRole(new String[] {"ADMIN", "MANAGER"})
                         .requestMatchers("/company/create").permitAll()
                         .requestMatchers("/company/**").hasAnyRole(new String[] {"ADMIN"})

@@ -21,7 +21,8 @@ public class Point {
     private UUID id;
 
     @Column(nullable = false)
-    private int total;
+    @Builder.Default
+    private int total = 0;
 
     @Builder.Default
     @Column(nullable = false)
@@ -30,4 +31,8 @@ public class Point {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, optional = false)
     @JoinColumn(name = "employee_id")
     private Employee employee;
+
+    public Point(Employee employee) {
+        this.employee = employee;
+    }
 }

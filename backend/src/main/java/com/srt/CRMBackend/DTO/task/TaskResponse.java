@@ -1,6 +1,7 @@
 package com.srt.CRMBackend.DTO.task;
 
-import com.srt.CRMBackend.DTO.project.ProjectResponse;
+import com.srt.CRMBackend.DTO.project.GetProjectResponse;
+import com.srt.CRMBackend.DTO.project.ProjectTaskResponse;
 import com.srt.CRMBackend.models.tasks.TaskStatus;
 import lombok.Builder;
 import lombok.Data;
@@ -18,5 +19,5 @@ public class TaskResponse {
     private LocalDate deadline;
     private TaskCategoryDTO category;
     private TaskStatus status;
-    private ProjectResponse project;
+    private GetProjectResponse project;
 }

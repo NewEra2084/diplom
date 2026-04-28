@@ -1,7 +1,8 @@
 package com.srt.CRMBackend.services.employee.impl;
 
-import com.srt.CRMBackend.DTO.task.GetTaskEmployeeRequests;
+import com.srt.CRMBackend.DTO.task.GetTaskExecutionRequestResponse;
 import com.srt.CRMBackend.DTO.task.TaskResponse;
+import com.srt.CRMBackend.DTO.task.report.SendTaskReportRequest;
 import com.srt.CRMBackend.auth.UserDetailsImpl;
 import com.srt.CRMBackend.exceptions.CrmBadRequestException;
 import com.srt.CRMBackend.mappers.TaskExecutionRequestMapper;
@@ -11,15 +12,17 @@ import com.srt.CRMBackend.models.tasks.*;
 import com.srt.CRMBackend.repositories.tasks.EmployeeTaskRepository;
 import com.srt.CRMBackend.repositories.tasks.TaskExecutionRequestRepository;
 import com.srt.CRMBackend.repositories.tasks.TaskRepository;
+import com.srt.CRMBackend.services.company.domain.CompanyDomainService;
 import com.srt.CRMBackend.services.employee.EmployeeTaskService;
-import jakarta.transaction.Transactional;
+import com.srt.CRMBackend.services.task.domain.TaskDomainService;
+import com.srt.CRMBackend.services.task.domain.TaskReportDomainService;
+import com.srt.CRMBackend.util.AuthHelperUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,22 +33,29 @@ public class EmployeeTaskServiceImpl implements EmployeeTaskService {
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
 
+    private final AuthHelperUtil authHelperUtil;
+    private final CompanyDomainService companyDomainService;
+    private final TaskDomainService taskDomainService;
+    private final TaskReportDomainService taskReportDomainService;
+
     @Override
-    @Transactional
     public void takeTask(UUID taskId) {
-        if (!taskRepository.existsById(taskId)) {
-            throw new CrmBadRequestException("некорректный идентификатор");
+        // TODO прикрепление к проекту
+        Task task = taskRepository.findByCompanyAndId(companyDomainService.getCompanyReference(), taskId)
+                .orElseThrow(() -> new CrmBadRequestException("задача не найдена у данной компании"));
+
+        if (task.getStatus() != TaskStatus.FREE) {
+            throw new CrmBadRequestException("задача не свободна");
         }
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
 
         TaskExecutionRequest taskExecutionRequest = TaskExecutionRequest.builder()
-                .task(new Task(taskId))
-                .employee(userDetails.getEmployee()).build();
+                .task(task)
+                .employee(authHelperUtil.getEmployee())
+                .build();
         taskExecutionRequestRepository.save(taskExecutionRequest);
 
-        Task task = taskRepository.findById(taskId).orElseThrow(RuntimeException::new);
         task.setStatus(TaskStatus.ACTIVE);
+        taskRepository.save(task);
     }
 
     @Override
@@ -56,13 +66,11 @@ public class EmployeeTaskServiceImpl implements EmployeeTaskService {
     }
 
     @Override
-    public List<GetTaskEmployeeRequests> getAllRequests() {
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
-        return taskExecutionRequestRepository.findAllByEmployeeIdWithTask(
-                        userDetails.getEmployee().getId()).stream()
-                .map(taskExecutionRequestMapper::toGetTaskEmployeeRequests)
-                .collect(Collectors.toList());
+    public List<GetTaskExecutionRequestResponse> getAllRequests() {
+        return taskExecutionRequestRepository
+                .findAllWithProjectAndEmployeeByEmployee(authHelperUtil.getEmployee()).stream()
+                .map(taskExecutionRequestMapper::toResponse)
+                .toList();
     }
 
     @Override
@@ -74,18 +82,21 @@ public class EmployeeTaskServiceImpl implements EmployeeTaskService {
     }
 
     @Override
-    @Transactional
-    public void sendRequestForReview(UUID taskId) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
-        List<EmployeeTask> tasks = employeeTaskRepository.findAllTasksByEmployeeId(userDetails.getEmployee().getId());
-        for (EmployeeTask employeeTask : tasks) {
-            System.out.println(employeeTask.getTask().getId());
-            if (employeeTask.getTask().getId().equals(taskId)) {
-                employeeTask.setExecutionStatus(ExecutionStatus.SUBMITTED_FOR_REVIEW);
-                return;
-            }
-        }
-        throw new CrmBadRequestException("данная задача не найдена у пользователя");
+    public void sendReport(SendTaskReportRequest request) {
+        Task task = taskDomainService.getByIdAndCurrentCompany(request.getTaskId());
+        EmployeeTask employeeTask = employeeTaskRepository
+                .findByTaskAndEmployee(task, authHelperUtil.getEmployee())
+                .orElseThrow(() -> new CrmBadRequestException("не найдена запись задачи"));
+
+        employeeTask.setExecutionStatus(ExecutionStatus.SENT_REPORT);
+
+        // TODO files
+        TaskReport report = TaskReport.builder()
+                .title(request.getTitle())
+                .description(request.getDescription())
+                .employeeTask(employeeTask)
+                .build();
+
+        taskReportDomainService.save(report);
     }
 }

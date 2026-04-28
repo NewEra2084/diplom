@@ -22,7 +22,8 @@ CREATE TABLE tasks (
     publication_time TIMESTAMP NOT NULL,
     status VARCHAR(50) NOT NULL,
     task_category_id UUID NOT NULL,
-    project_id UUID REFERENCES projects(id) NOT NULL,
+    project_id UUID REFERENCES projects(id),
+    company_id UUID REFERENCES companies(id),
 
     CONSTRAINT fk_task_category FOREIGN KEY (task_category_id) REFERENCES task_categories(id)
 );

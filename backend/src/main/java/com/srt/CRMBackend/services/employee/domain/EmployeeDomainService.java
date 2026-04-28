@@ -15,6 +15,10 @@ import java.util.UUID;
 public class EmployeeDomainService {
     private final EmployeeRepository repository;
 
+    public Employee getReferenceById(UUID id) {
+        return repository.getReferenceById(id);
+    }
+
     public Employee getReferenceIfExistsById(UUID id) {
         if (!repository.existsById(id)) {
             throw new CrmBadRequestException("such employee not found");

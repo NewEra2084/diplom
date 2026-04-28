@@ -61,6 +61,7 @@ public class TaskServiceImpl implements TaskService {
                 .status(TaskStatus.FREE)
                 .taskCategory(taskCategory)
                 .project(project)
+                .company(companyDomainService.getCompanyReference())
                 .build();
         taskRepository.save(task);
     }
@@ -144,7 +145,7 @@ public class TaskServiceImpl implements TaskService {
                                 .name(t.getTaskCategory().getName())
                                 .description(t.getTaskCategory().getDescription()).build()
                         )
-                        .project(projectMapper.toResponse(t.getProject()))
+                        .project(projectMapper.toGetResponse(t.getProject()))
                         .status(t.getStatus()).build()
                 ).toList();
     }

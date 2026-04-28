@@ -118,59 +118,121 @@ INSERT INTO task_categories (name, description, company_id) VALUES
 ('Бюджетирование', 'Планирование и контроль бюджета', (SELECT id FROM companies WHERE name = 'ФинансГрупп'));
 
 -- Вставка задач
-INSERT INTO tasks (name, description, number_of_points, deadline, publication_time, status, task_category_id, project_id) VALUES
-('Разработать API для пользователей', 'Создать REST API для управления пользователями с JWT аутентификацией', 100, '2024-03-15', '2024-01-10 09:00:00', 'COMPLETED', (SELECT id FROM task_categories WHERE name = 'Разработка' AND company_id = (SELECT id FROM companies WHERE name = 'ТехноПром')), (SELECT id FROM projects WHERE name = 'Разработка CRM системы')),
-('Написать unit-тесты', 'Покрыть код сервисов unit-тестами с минимальным покрытием 80%', 50, '2024-02-28', '2024-01-15 10:30:00', 'ACTIVE', (SELECT id FROM task_categories WHERE name = 'Тестирование' AND company_id = (SELECT id FROM companies WHERE name = 'ТехноПром')), (SELECT id FROM projects WHERE name = 'Разработка CRM системы')),
-('Создать документацию API', 'Написать Swagger документацию для всех эндпоинтов', 30, '2024-02-20', '2024-01-20 14:00:00', 'ACTIVE', (SELECT id FROM task_categories WHERE name = 'Документация' AND company_id = (SELECT id FROM companies WHERE name = 'ТехноПром')), (SELECT id FROM projects WHERE name = 'Разработка CRM системы')),
-('Заливка фундамента', 'Подготовка и заливка фундамента для корпуса 1', 200, '2024-04-10', '2024-01-05 08:00:00', 'ACTIVE', (SELECT id FROM task_categories WHERE name = 'Строительные работы'), (SELECT id FROM projects WHERE name = 'Жилой комплекс "Солнечный"')),
-('Подготовка почвы', 'Вспашка и удобрение полей под посев', 75, '2024-03-25', '2024-01-12 07:30:00', 'COMPLETED', (SELECT id FROM task_categories WHERE name = 'Полевые работы'), (SELECT id FROM projects WHERE name = 'Весенняя посевная')),
-('Проведение осмотров', 'Профилактические осмотры сотрудников предприятия', 80, '2024-03-20', '2024-01-18 09:15:00', 'ACTIVE', (SELECT id FROM task_categories WHERE name = 'Прием пациентов'), (SELECT id FROM projects WHERE name = 'Модернизация оборудования')),
-('Разработка дашборда', 'Создать интерактивный дашборд для финансовой отчетности', 120, '2024-03-30', '2024-01-22 11:00:00', 'ACTIVE', (SELECT id FROM task_categories WHERE name = 'Финансовый анализ'), (SELECT id FROM projects WHERE name = 'Финансовый дашборд')),
-('Настройка серверов', 'Настройка production серверов и развертывание приложения', 60, '2024-02-25', '2024-01-08 13:00:00', 'COMPLETED', (SELECT id FROM task_categories WHERE name = 'Разработка' AND company_id = (SELECT id FROM companies WHERE name = 'ТехноПром')), (SELECT id FROM projects WHERE name = 'Разработка CRM системы')),
-('Согласование сметы', 'Согласование строительной сметы с заказчиком', 40, '2024-02-15', '2024-01-25 10:00:00', 'ACTIVE', (SELECT id FROM task_categories WHERE name = 'Строительные работы'), (SELECT id FROM projects WHERE name = 'Жилой комплекс "Солнечный"'));
-
--- Вставка назначений задач сотрудникам (employee_tasks)
-INSERT INTO employee_tasks (employee_id, task_id, execution_status) VALUES
-((SELECT id FROM employees WHERE login = 'alexey.ivanov'), (SELECT id FROM tasks WHERE name = 'Разработать API для пользователей'), 'COMPLETED'),
-((SELECT id FROM employees WHERE login = 'alexey.ivanov'), (SELECT id FROM tasks WHERE name = 'Написать unit-тесты'), 'IN_PROGRESS'),
-((SELECT id FROM employees WHERE login = 'tatyana.sokolova'), (SELECT id FROM tasks WHERE name = 'Создать документацию API'), 'IN_PROGRESS'),
-((SELECT id FROM employees WHERE login = 'dmitry.smirnov'), (SELECT id FROM tasks WHERE name = 'Заливка фундамента'), 'IN_PROGRESS'),
-((SELECT id FROM employees WHERE login = 'olga.kuznetsova'), (SELECT id FROM tasks WHERE name = 'Подготовка почвы'), 'COMPLETED'),
-((SELECT id FROM employees WHERE login = 'anna.volkova'), (SELECT id FROM tasks WHERE name = 'Проведение осмотров'), 'OVERDUE'),
-((SELECT id FROM employees WHERE login = 'natalya.fedorova'), (SELECT id FROM tasks WHERE name = 'Разработка дашборда'), 'IN_PROGRESS'),
-((SELECT id FROM employees WHERE login = 'alexey.ivanov'), (SELECT id FROM tasks WHERE name = 'Настройка серверов'), 'COMPLETED'),
-((SELECT id FROM employees WHERE login = 'dmitry.smirnov'), (SELECT id FROM tasks WHERE name = 'Согласование сметы'), 'IN_PROGRESS'),
-((SELECT id FROM employees WHERE login = 'tatyana.sokolova'), (SELECT id FROM tasks WHERE name = 'Разработать API для пользователей'), 'COMPLETED'),
-((SELECT id FROM employees WHERE login = 'alexey.ivanov'), (SELECT id FROM tasks WHERE name = 'Разработка дашборда'), 'IN_PROGRESS');
-
--- Вставка комментариев к задачам
-INSERT INTO task_comments (comment, date_of_writing, employee_id, task_id) VALUES
-('API готов, отправляю на ревью', '2024-02-01 15:30:00', (SELECT id FROM employees WHERE login = 'alexey.ivanov'), (SELECT id FROM tasks WHERE name = 'Разработать API для пользователей')),
-('Тесты написаны, покрытие 85%', '2024-02-10 11:20:00', (SELECT id FROM employees WHERE login = 'alexey.ivanov'), (SELECT id FROM tasks WHERE name = 'Написать unit-тесты')),
-('Работа идет по плану, закончу к дедлайну', '2024-02-05 09:45:00', (SELECT id FROM employees WHERE login = 'tatyana.sokolova'), (SELECT id FROM tasks WHERE name = 'Создать документацию API')),
-('Фундамент залит, ждем застывания', '2024-02-12 16:00:00', (SELECT id FROM employees WHERE login = 'dmitry.smirnov'), (SELECT id FROM tasks WHERE name = 'Заливка фундамента')),
-('Почва подготовлена, можно сеять', '2024-01-30 08:30:00', (SELECT id FROM employees WHERE login = 'olga.kuznetsova'), (SELECT id FROM tasks WHERE name = 'Подготовка почвы')),
-('Осмотры задерживаются из-за отсутствия оборудования', '2024-02-08 14:15:00', (SELECT id FROM employees WHERE login = 'anna.volkova'), (SELECT id FROM tasks WHERE name = 'Проведение осмотров')),
-('Дашборд в разработке, готов макет', '2024-02-07 12:00:00', (SELECT id FROM employees WHERE login = 'natalya.fedorova'), (SELECT id FROM tasks WHERE name = 'Разработка дашборда')),
-('Сервера настроены успешно', '2024-01-28 17:30:00', (SELECT id FROM employees WHERE login = 'alexey.ivanov'), (SELECT id FROM tasks WHERE name = 'Настройка серверов'));
-
--- Вставка запросов (requests)
-INSERT INTO requests (is_accepted, task_id, employee_id, appointor_id) VALUES
-(TRUE, (SELECT id FROM tasks WHERE name = 'Разработать API для пользователей'), (SELECT id FROM employees WHERE login = 'alexey.ivanov'), (SELECT id FROM employees WHERE login = 'maria.sidorova')),
-(FALSE, (SELECT id FROM tasks WHERE name = 'Написать unit-тесты'), (SELECT id FROM employees WHERE login = 'alexey.ivanov'), (SELECT id FROM employees WHERE login = 'maria.sidorova')),
-(TRUE, (SELECT id FROM tasks WHERE name = 'Заливка фундамента'), (SELECT id FROM employees WHERE login = 'dmitry.smirnov'), (SELECT id FROM employees WHERE login = 'elena.kozlova')),
-(TRUE, (SELECT id FROM tasks WHERE name = 'Разработка дашборда'), (SELECT id FROM employees WHERE login = 'natalya.fedorova'), (SELECT id FROM employees WHERE login = 'andrey.zaytsev'));
-
--- Вставка запросов на выполнение задач (task_execution_requests)
-INSERT INTO task_execution_requests (employee_id, task_id, is_accepted) VALUES
-((SELECT id FROM employees WHERE login = 'tatyana.sokolova'), (SELECT id FROM tasks WHERE name = 'Написать unit-тесты'), TRUE),
-((SELECT id FROM employees WHERE login = 'dmitry.smirnov'), (SELECT id FROM tasks WHERE name = 'Создать документацию API'), FALSE),
-((SELECT id FROM employees WHERE login = 'anna.volkova'), (SELECT id FROM tasks WHERE name = 'Подготовка почвы'), TRUE),
-((SELECT id FROM employees WHERE login = 'alexey.ivanov'), (SELECT id FROM tasks WHERE name = 'Согласование сметы'), TRUE),
-((SELECT id FROM employees WHERE login = 'vladimir.mikhaylov'), (SELECT id FROM tasks WHERE name = 'Проведение осмотров'), FALSE);
-
--- Вставка токенов (для активных сессий)
-INSERT INTO tokens (employee_id, token) VALUES
-((SELECT id FROM employees WHERE login = 'ivan.petrov'), 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpdmFuLnBldHJvdiIsIm5hbWUiOiJJdmFuIFBldHJvdiJ9.example1'),
-((SELECT id FROM employees WHERE login = 'maria.sidorova'), 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXJpYS5zaWRvcm92YSIsIm5hbWUiOiJNYXJpYSBTaWRvcm92YSJ9.example2'),
-((SELECT id FROM employees WHERE login = 'alexey.ivanov'), 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbGV4ZXkuaXZhbm92IiwibmFtZSI6IkFsZXhleSBJdmFub3YifQ.example3');
+INSERT INTO tasks (
+    name,
+    description,
+    number_of_points,
+    deadline,
+    publication_time,
+    status,
+    task_category_id,
+    project_id,
+    company_id
+) VALUES
+(
+    'Разработать API для пользователей',
+    'Создать REST API для управления пользователями с JWT аутентификацией',
+    100,
+    '2024-03-15',
+    '2024-01-10 09:00:00',
+    'FREE',
+    (SELECT id FROM task_categories
+        WHERE name = 'Разработка'
+        AND company_id = (SELECT id FROM companies WHERE name = 'ТехноПром')),
+    (SELECT id FROM projects WHERE name = 'Разработка CRM системы'),
+    (SELECT company_id FROM projects WHERE name = 'Разработка CRM системы')
+),
+(
+    'Написать unit-тесты',
+    'Покрыть код сервисов unit-тестами с минимальным покрытием 80%',
+    50,
+    '2024-02-28',
+    '2024-01-15 10:30:00',
+    'FREE',
+    (SELECT id FROM task_categories
+        WHERE name = 'Тестирование'
+        AND company_id = (SELECT id FROM companies WHERE name = 'ТехноПром')),
+    (SELECT id FROM projects WHERE name = 'Разработка CRM системы'),
+    (SELECT company_id FROM projects WHERE name = 'Разработка CRM системы')
+),
+(
+    'Создать документацию API',
+    'Написать Swagger документацию для всех эндпоинтов',
+    30,
+    '2024-02-20',
+    '2024-01-20 14:00:00',
+    'FREE',
+    (SELECT id FROM task_categories
+        WHERE name = 'Документация'
+        AND company_id = (SELECT id FROM companies WHERE name = 'ТехноПром')),
+    (SELECT id FROM projects WHERE name = 'Разработка CRM системы'),
+    (SELECT company_id FROM projects WHERE name = 'Разработка CRM системы')
+),
+(
+    'Заливка фундамента',
+    'Подготовка и заливка фундамента для корпуса 1',
+    200,
+    '2024-04-10',
+    '2024-01-05 08:00:00',
+    'FREE',
+    (SELECT id FROM task_categories WHERE name = 'Строительные работы'),
+    (SELECT id FROM projects WHERE name = 'Жилой комплекс "Солнечный"'),
+    (SELECT company_id FROM projects WHERE name = 'Жилой комплекс "Солнечный"')
+),
+(
+    'Подготовка почвы',
+    'Вспашка и удобрение полей под посев',
+    75,
+    '2024-03-25',
+    '2024-01-12 07:30:00',
+    'FREE',
+    (SELECT id FROM task_categories WHERE name = 'Полевые работы'),
+    (SELECT id FROM projects WHERE name = 'Весенняя посевная'),
+    (SELECT company_id FROM projects WHERE name = 'Весенняя посевная')
+),
+(
+    'Проведение осмотров',
+    'Профилактические осмотры сотрудников предприятия',
+    80,
+    '2024-03-20',
+    '2024-01-18 09:15:00',
+    'FREE',
+    (SELECT id FROM task_categories WHERE name = 'Прием пациентов'),
+    (SELECT id FROM projects WHERE name = 'Модернизация оборудования'),
+    (SELECT company_id FROM projects WHERE name = 'Модернизация оборудования')
+),
+(
+    'Разработка дашборда',
+    'Создать интерактивный дашборд для финансовой отчетности',
+    120,
+    '2024-03-30',
+    '2024-01-22 11:00:00',
+    'FREE',
+    (SELECT id FROM task_categories WHERE name = 'Финансовый анализ'),
+    (SELECT id FROM projects WHERE name = 'Финансовый дашборд'),
+    (SELECT company_id FROM projects WHERE name = 'Финансовый дашборд')
+),
+(
+    'Настройка серверов',
+    'Настройка production серверов и развертывание приложения',
+    60,
+    '2024-02-25',
+    '2024-01-08 13:00:00',
+    'FREE',
+    (SELECT id FROM task_categories
+        WHERE name = 'Разработка'
+        AND company_id = (SELECT id FROM companies WHERE name = 'ТехноПром')),
+    (SELECT id FROM projects WHERE name = 'Разработка CRM системы'),
+    (SELECT company_id FROM projects WHERE name = 'Разработка CRM системы')
+),
+(
+    'Согласование сметы',
+    'Согласование строительной сметы с заказчиком',
+    40,
+    '2024-02-15',
+    '2024-01-25 10:00:00',
+    'FREE',
+    (SELECT id FROM task_categories WHERE name = 'Строительные работы'),
+    (SELECT id FROM projects WHERE name = 'Жилой комплекс "Солнечный"'),
+    (SELECT company_id FROM projects WHERE name = 'Жилой комплекс "Солнечный"')
+);

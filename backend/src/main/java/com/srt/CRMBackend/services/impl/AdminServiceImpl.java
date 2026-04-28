@@ -12,6 +12,7 @@ import com.srt.CRMBackend.models.employees.*;
 import com.srt.CRMBackend.repositories.employee.*;
 import com.srt.CRMBackend.repositories.tasks.RequestRepository;
 import com.srt.CRMBackend.services.AdminService;
+import com.srt.CRMBackend.services.PointDomainService;
 import com.srt.CRMBackend.services.company.domain.CompanyDomainService;
 import com.srt.CRMBackend.util.AuthHelperUtil;
 import jakarta.transaction.Transactional;
@@ -33,6 +34,7 @@ public class AdminServiceImpl implements AdminService {
     private final RequestRepository requestRepository;
     private final CompanyDomainService companyDomainService;
     private final AuthHelperUtil authHelperUtil;
+    private final PointDomainService pointDomainService;
 
     @Override
     public void addEmployee(AddEmployeeRequest request) {
@@ -66,6 +68,8 @@ public class AdminServiceImpl implements AdminService {
                 .company(company)
                 .roles(Set.of(roleRepository.getByName(request.getRole()))).build();
         employeeRepository.save(employee);
+
+        pointDomainService.createDefault(employee);
     }
 
     @Override

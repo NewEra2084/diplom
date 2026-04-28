@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+// TODO REMOVE
 @Entity
 @Table(name = "requests")
 @Data
