@@ -1,16 +1,28 @@
-import { Fields, useProfileStore } from "@/app/[locale]/profile/store/profileStore";
+import {
+  Fields,
+  useProfileStore,
+} from "@/app/[locale]/profile/store/profileStore";
 import { useUserStore } from "@/entities/user/model/store";
 import { EditableField } from "@/shared/ui/EditableField";
 
-type FieldKey = keyof Fields;
+export type FieldKey = keyof Fields;
 type Props = {
   field: FieldKey;
   purpose: string;
+  shown?: string;
   available: boolean;
-  type?: string
+  type?: "text" | "select";
+  options?: { id: string; name: string }[];
 };
 
-export const DataField = ({ field, type, available, purpose }: Props) => {
+export const DataField = ({
+  field,
+  options,
+  shown,
+  type,
+  available,
+  purpose,
+}: Props) => {
   const changeField = useProfileStore((state) => state.changeField);
   const isEdit = useProfileStore((state) => state.isEdit);
   const fields = useProfileStore((state) => state.fields);
@@ -30,7 +42,8 @@ export const DataField = ({ field, type, available, purpose }: Props) => {
       ) : userData?.rolesName.includes("ROLE_ADMIN") ? (
         <EditableField
           purpose={purpose}
-          text={fields[field]}
+          text={shown || fields[field]}
+          options={options}
           type={type}
           isEdit={isEdit}
           onChange={(value: string) => {

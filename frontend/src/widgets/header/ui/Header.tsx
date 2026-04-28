@@ -1,13 +1,12 @@
 "use client";
 import { Logo } from "./logo";
 import { Navigation } from "../components/Navigation";
-import { Suspense } from "react";
 import { Menu, X } from "lucide-react";
 import { BurgerMenu } from "../components/BurgerMenu";
 import Link from "next/link";
 import { HeaderStore } from "../store/HeaderStore";
 
-export const Header = ({}) => {
+export const Header = () => {
   const isOpen = HeaderStore((store)=>store.isOpen);
   const setIsOpen = HeaderStore((store)=>store.setIsOpen);
 
@@ -16,9 +15,7 @@ export const Header = ({}) => {
       <Link href="/">
         <Logo />
       </Link>
-      <Suspense fallback={<div>Loading</div>}>
         <Navigation className="mx-auto hidden lg:flex" />
-      </Suspense>
       {!isOpen.is && (
         <Menu
           className="lg:hidden"

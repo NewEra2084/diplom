@@ -1,7 +1,7 @@
 "use client";
 import { useAuthGuard } from "@/features/auth/useAuthGuard";
 import { useUserStore } from "@/entities/user/model/store";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { UserData } from "@/widgets/profile/UserData";
 import { CompanyData } from "@/widgets/profileCompany/CompanyData";
 
@@ -18,7 +18,9 @@ export default function Page() {
   }, [getPoints, getUserData]);
   return (
     <>
-      <UserData />
+      <Suspense fallback={<div>wkfowekfowek</div>}>
+        <UserData />
+      </Suspense>
       <CompanyData />
     </>
   );

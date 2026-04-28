@@ -31,7 +31,7 @@ export const FormLabelInput = ({
       />
       <label
         htmlFor={id}
-        className={`${inputState != "" ? "-top-5 inset-y-auto border-t-2 border-x-2 bg-main" : "peer-focus:-top-5 peer-focus:inset-y-auto"} absolute inset-y-1 transition-all my-auto peer-focus:text-main peer-focus:bg-secondary rounded-t-lg px-3 peer-focus:border-x-2 peer-focus:border-t-2  left-5 flex items-center`}
+        className={`${inputState != "" ? "-top-5 inset-y-auto border-t-2 border-x-2 bg-main" : "peer-focus:-top-5 peer-focus:inset-y-auto"} absolute w-24 inset-y-1 transition-all my-auto peer-focus:text-main peer-focus:bg-secondary rounded-t-lg px-3 peer-focus:border-x-2 peer-focus:border-t-2  left-5 flex items-center`}
       >
         {title}
       </label>

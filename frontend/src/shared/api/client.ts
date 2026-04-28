@@ -57,14 +57,14 @@ const postTemplate = async (
   }
 };
 
-const getTemplate = async (url: string, contentType = "application/json") => {
+const getTemplate = async <T>(url: string, contentType = "application/json") => {
   try {
     const { data, status } = await api.get(url, {
       headers: {
         "Content-Type": contentType,
       },
-    });
-    return { data: data, status: status };
+    });    
+    return { data: data as T, status: status };
   } catch (error) {
     throw error;
   }

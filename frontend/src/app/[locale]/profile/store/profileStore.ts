@@ -2,14 +2,14 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export type Fields = {
-  email: string | undefined;
-  login: string | undefined;
-  firstName: string | undefined;
-  lastName: string | undefined;
-  patronymic: string | undefined;
-  jobTitleName: string | undefined;
-  qualificationName: string | undefined;
-  role: string | undefined;
+  email: string;
+  login: string;
+  firstName: string;
+  lastName: string;
+  patronymic: string;
+  jobTitleId: string;
+  qualificationId: string;
+  role: string;
 };
 
 type ProfileStore = {
@@ -24,14 +24,14 @@ export const useProfileStore = create<ProfileStore>()(
   persist(
     (set) => ({
       fields: {
-        email: undefined,
-        firstName: undefined,
-        lastName: undefined,
-        login: undefined,
-        patronymic: undefined,
-        jobTitleName: undefined,
-        qualificationName: undefined,
-        role: undefined,
+        email: "",
+        firstName: "",
+        lastName: "",
+        login: "",
+        patronymic: "",
+        jobTitleId: "",
+        qualificationId: "",
+        role: "",
       },
       isEdit: false,
       changeIsEdit: (value) => {
@@ -45,6 +45,7 @@ export const useProfileStore = create<ProfileStore>()(
           ...prev,
           fields: { ...prev.fields, [field]: value },
         }));
+        
       },
     }),
     { name: "profileData" },
