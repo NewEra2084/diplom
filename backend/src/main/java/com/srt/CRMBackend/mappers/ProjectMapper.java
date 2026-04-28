@@ -1,6 +1,7 @@
 package com.srt.CRMBackend.mappers;
 
 import com.srt.CRMBackend.DTO.project.AddProjectRequest;
+import com.srt.CRMBackend.DTO.project.GetProjectResponse;
 import com.srt.CRMBackend.DTO.project.ProjectResponse;
 import com.srt.CRMBackend.DTO.project.ProjectTaskResponse;
 import com.srt.CRMBackend.models.tasks.Project;
@@ -17,4 +18,6 @@ public interface ProjectMapper {
 
     @Mapping(target = "category", source = "taskCategory")
     ProjectTaskResponse toTaskResponse(Task task);
+
+    GetProjectResponse toGetResponse(Project project);
 }

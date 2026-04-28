@@ -1,92 +1,69 @@
 package com.srt.CRMBackend.services.task.impl;
 
-import com.srt.CRMBackend.DTO.request.EmployeeTaskDTO;
-import com.srt.CRMBackend.DTO.request.TaskExecutionRequestDTO;
+import com.srt.CRMBackend.DTO.task.GetTaskExecutionRequestResponse;
 import com.srt.CRMBackend.exceptions.CrmBadRequestException;
-import com.srt.CRMBackend.mappers.EmployeeMapper;
-import com.srt.CRMBackend.mappers.TaskMapper;
+import com.srt.CRMBackend.mappers.TaskExecutionRequestMapper;
 import com.srt.CRMBackend.models.employees.Employee;
-import com.srt.CRMBackend.models.employees.Point;
-import com.srt.CRMBackend.models.tasks.*;
-import com.srt.CRMBackend.repositories.employee.PointRepository;
-import com.srt.CRMBackend.repositories.tasks.EmployeeTaskRepository;
+import com.srt.CRMBackend.models.tasks.TaskExecutionRequest;
+import com.srt.CRMBackend.models.tasks.TaskExecutionRequestStatus;
 import com.srt.CRMBackend.repositories.tasks.TaskExecutionRequestRepository;
-import com.srt.CRMBackend.repositories.tasks.TaskRepository;
+import com.srt.CRMBackend.services.company.domain.CompanyDomainService;
 import com.srt.CRMBackend.services.employee.EmployeeTaskService;
+import com.srt.CRMBackend.services.employee.domain.EmployeeDomainService;
 import com.srt.CRMBackend.services.task.RequestService;
+import com.srt.CRMBackend.util.AuthHelperUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
 public class RequestServiceImpl implements RequestService {
     private final TaskExecutionRequestRepository taskExecutionRequestRepository;
-    private final EmployeeMapper employeeMapper;
-    private final TaskMapper taskMapper;
     private final EmployeeTaskService employeeTaskService;
-    private final EmployeeTaskRepository employeeTaskRepository;
-    private final TaskRepository taskRepository;
-    private final PointRepository pointRepository;
+
+    private final CompanyDomainService companyDomainService;
+    private final AuthHelperUtil authHelperUtil;
+    private final TaskExecutionRequestMapper taskExecutionRequestMapper;
+    private final EmployeeDomainService employeeDomainService;
 
     @Override
-    public List<TaskExecutionRequestDTO> getUnacceptedExecutionRequests() {
-        return taskExecutionRequestRepository.findAllUnacceptedWithEmployeeAndTask().stream()
-                .map(el -> TaskExecutionRequestDTO.builder()
-                        .id(el.getId())
-                        .employee(employeeMapper.toEmployeeDTO(el.getEmployee()))
-                        .task(taskMapper.toTaskResponse(el.getTask())).build()
-                ).toList();
-    }
+    public List<GetTaskExecutionRequestResponse> getExecutionRequests() {
+        List<TaskExecutionRequest> projectRequests = taskExecutionRequestRepository
+                .findAllWithTaskAndEmployeeAndProjectByCompanyAndManager(
+                        companyDomainService.getCompanyReference(),
+                        authHelperUtil.getEmployee());
+        List<TaskExecutionRequest> requests = taskExecutionRequestRepository
+                .findAllWithTaskAndEmployeeAndProjectByCompanyWithoutProject(
+                        companyDomainService.getCompanyReference());
 
-    @Override
-    @Transactional
-    public void acceptExecutionRequest(UUID requestId) {
-        TaskExecutionRequest taskExecutionRequest = taskExecutionRequestRepository.findById(requestId)
-                .orElseThrow(() -> new CrmBadRequestException("неправильный идентификатор"));
-        taskExecutionRequest.setAccepted(true);
-
-        employeeTaskService.saveEmployeeTask(
-                taskExecutionRequest.getEmployee().getId(),
-                taskExecutionRequest.getTask().getId()
-        );
-    }
-
-    @Override
-    @Transactional
-    public List<EmployeeTaskDTO> getEmployeeTasksSubmittedForReview() {
-        return employeeTaskRepository.findByExecutionStatus(ExecutionStatus.SUBMITTED_FOR_REVIEW)
-                .stream().map((et) -> EmployeeTaskDTO.builder()
-                        .id(et.getId())
-                        .task(taskMapper.toTaskResponse(et.getTask()))
-                        .employee(employeeMapper.toEmployeeDTO(et.getEmployee()))
-                        .build())
+        return Stream.concat(projectRequests.stream(), requests.stream())
+                .map(taskExecutionRequestMapper::toResponse)
                 .toList();
     }
 
     @Override
     @Transactional
-    public void acceptTaskSubmittedForReview(UUID employeeTaskId) {
-        EmployeeTask employeeTask = employeeTaskRepository.findById(employeeTaskId)
-                .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор"));
-        employeeTask.setExecutionStatus(ExecutionStatus.ACCEPTED);
+    public void acceptExecutionRequest(UUID requestId) {
+        TaskExecutionRequest taskExecutionRequest = taskExecutionRequestRepository
+                .findWithTaskAndEmployeeByIdAndTask_company(requestId, companyDomainService.getCompanyReference())
+                .orElseThrow(() -> new CrmBadRequestException("неправильный идентификатор"));
 
-        Task task = taskRepository.findById(employeeTask.getTask().getId())
-                .orElseThrow(RuntimeException::new);
-        task.setStatus(TaskStatus.COMPLETED);
+        if (taskExecutionRequest.getTask().getProject() != null &&
+                !taskExecutionRequest.getTask().getProject().getManager().getId()
+                        .equals(authHelperUtil.getEmployee().getId())) {
+            throw new CrmBadRequestException("нету прав для принятия задачи");
+        }
 
-        Point point = pointRepository.findByEmployeeId(employeeTask.getEmployee().getId())
-                .orElseGet(() ->
-                    pointRepository.save(Point.builder()
-                            .employee(employeeTask.getEmployee())
-                            .total(0).build())
-                );
-        point.setTotal(point.getTotal() + task.getNumberOfPoints());
+        taskExecutionRequest.setStatus(TaskExecutionRequestStatus.ACCEPTED);
+
+        employeeTaskService.saveEmployeeTask(
+                taskExecutionRequest.getEmployee().getId(),
+                taskExecutionRequest.getTask().getId()
+        );
     }
 }

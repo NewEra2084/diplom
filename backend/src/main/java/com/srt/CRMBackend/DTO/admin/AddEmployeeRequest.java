@@ -31,8 +31,4 @@ public class AddEmployeeRequest {
 
     @NotBlank
     private String role;
-
-    private String phoneNumber;
-    private int passportNumber;
-    private int passportSeries;
 }

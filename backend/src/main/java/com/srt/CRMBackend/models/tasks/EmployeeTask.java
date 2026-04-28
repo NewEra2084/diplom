@@ -27,11 +27,12 @@ public class EmployeeTask {
     @JoinColumn(name = "employee_id")
     private Employee employee;
 
-    @ManyToOne(optional = false)
+    @OneToOne(optional = false)
     @JoinColumn(name = "task_id")
     private Task task;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private ExecutionStatus executionStatus = ExecutionStatus.IN_PROGRESS;
 }

@@ -1,16 +1,16 @@
 package com.srt.CRMBackend.controllers.employee;
 
 import com.srt.CRMBackend.DTO.task.GetTaskEmployeeRequests;
+import com.srt.CRMBackend.DTO.task.GetTaskExecutionRequestResponse;
 import com.srt.CRMBackend.DTO.task.TaskResponse;
+import com.srt.CRMBackend.DTO.task.report.SendTaskReportRequest;
 import com.srt.CRMBackend.services.employee.EmployeeTaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -25,7 +25,7 @@ public class EmployeeTaskController {
     private final EmployeeTaskService employeeTaskService;
 
     @Operation(description = "после взятии задачи отправляется заявка на подтверждение")
-    @GetMapping("/take/{taskId}")
+    @PostMapping("/take/{taskId}")
     public Map<String, String> takeTask(@PathVariable UUID taskId) {
         log.info("call take task endpoint");
         employeeTaskService.takeTask(taskId);
@@ -34,7 +34,7 @@ public class EmployeeTaskController {
 
     @Operation(description = "получение всех заявок на выполнение задачи у работника")
     @GetMapping("/get_all_requests")
-    public List<GetTaskEmployeeRequests> getAllRequests() {
+    public List<GetTaskExecutionRequestResponse> getAllRequests() {
         log.info("call get all requests");
         return employeeTaskService.getAllRequests();
     }
@@ -46,10 +46,10 @@ public class EmployeeTaskController {
         return employeeTaskService.getAllTasks();
     }
 
-    @Operation(description = "отправка заявки на проверку задачи")
-    @GetMapping("/send_task_for_review/{taskId}")
-    public Map<String, String> sendRequestForReview(@PathVariable UUID taskId) {
-        employeeTaskService.sendRequestForReview(taskId);
+    @Operation(description = "отправка отчёта")
+    @PostMapping("/send/report")
+    public Map<String, String> sendReport(@RequestBody @Valid SendTaskReportRequest request) {
+        employeeTaskService.sendReport(request);
         return Map.of("message", "заявка отправлена");
     }
 }

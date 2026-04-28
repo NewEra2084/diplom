@@ -1,5 +1,7 @@
 package com.srt.CRMBackend.models.tasks;
 
+import com.srt.CRMBackend.models.Company;
+import com.srt.CRMBackend.models.employees.Employee;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,9 +48,13 @@ public class Task {
     @JoinColumn(name = "task_category_id")
     private TaskCategory taskCategory;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = true)
     @JoinColumn(name = "project_id")
     private Project project;
+
+    @ManyToOne
+    @JoinColumn(name = "company_id")
+    private Company company;
 
     public Task(UUID id) {
         this.id = id;

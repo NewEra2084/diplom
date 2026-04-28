@@ -2,16 +2,16 @@ package com.srt.CRMBackend.models.tasks;
 
 import com.srt.CRMBackend.models.employees.Employee;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+// запрос на выполнение задачи работником, может быть принят менеджером или админом
 @Entity
 @Table(name = "task_execution_requests")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -28,5 +28,8 @@ public class TaskExecutionRequest {
     @JoinColumn(name = "task_id")
     private Task task;
 
-    private boolean isAccepted = false;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private TaskExecutionRequestStatus status = TaskExecutionRequestStatus.PENDING;
 }
