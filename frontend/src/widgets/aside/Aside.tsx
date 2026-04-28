@@ -16,7 +16,7 @@ export const Aside = ({ title, elements }: Props) => {
   const locale = useLocale();
 
   return (
-    <div className="flex gap-3">
+    <div className="flex h-full gap-3">
       {isOpen && (
         <aside
           className={`h-full flex flex-col select-none p-8 rounded-xl border-2 border-secondary dark:border-dark-secondary`}
