@@ -13,6 +13,8 @@ export type User = {
 
 export type useUser = {
   user: User | null;
+  points: number;
   fetchUser: () => Promise<void>;
+  getPoints: () => Promise<void>;
   logout: () => void;
 };

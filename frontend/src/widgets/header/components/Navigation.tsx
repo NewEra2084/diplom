@@ -1,5 +1,5 @@
 import { useUserStore } from "@/entities/user/model/store";
-import { roles, User } from "@/entities/user/types";
+import { roles } from "@/entities/user/types";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { NavListItem } from "./NavListItem";
@@ -65,6 +65,9 @@ export const Navigation = ({ className }: Props) => {
   useEffect(()=>{
     fetchUsers();
   },[fetchUsers])
+  useEffect(()=>{
+    
+  }, [userData])
 
   const toggleItem = (title: string) => {
     setOpenItemId((prev) => (prev === title ? null : title));
