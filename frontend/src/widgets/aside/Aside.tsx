@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import { AsideElement } from "./components/AsideElement";
 import { usePathname } from "next/navigation";
 import { useLocale } from "next-intl";
@@ -36,7 +36,7 @@ export const Aside = ({ title, elements }: Props) => {
       )}
       <div
         onClick={() => setAsideIsOpen()}
-        className="hover:bg-accent/50 hidden lg:flex items-center transition-all"
+        className="hover:bg-accent/50 flex items-center transition-all"
       >
         {asideIsOpen ? (
           <ChevronLeft size={30} className="mx-auto" />
