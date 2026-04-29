@@ -36,7 +36,7 @@ export const Navigation = ({ className }: Props) => {
             userData &&
             item.roles?.includes(userData.rolesName[0]) && (
               <li
-                className="relative p-5 hover:bg-accent/50 cursor-pointer"
+                className="relative p-5 hover:bg-accent/50 dark:hover:bg-dark-accent/30 cursor-pointer"
                 key={idx}
                 onClick={() => toggleItem(t(item.title))}
               >

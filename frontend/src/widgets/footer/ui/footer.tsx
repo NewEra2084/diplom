@@ -9,7 +9,7 @@ import { LocaleSwitcher } from "@/features/language/LanguageSwitcher";
 
 export const Footer = () => {
   return (
-    <footer className="bg-secondary text-main dark:bg-dark-secondary pt-5">
+    <footer className="bg-secondary text-main dark:text-dark-main dark:bg-dark-secondary pt-5">
       <div className="pl-8 pr-5 flex gap-2 justify-between">
         <div className="flex-2">
           <Logo className="mb-4" />
@@ -24,10 +24,13 @@ export const Footer = () => {
         <div className="flex-4">
           <div className="flex lg:flex-row flex-col lg:px-10 text-lg pt-3">
             <div>
-              <h4 className="text-xl text-right lg:text-left border-b-2 font-bold text-[#DD5957] border-accent">
+              <h4 className="text-xl text-right lg:text-left border-b-2 font-bold text-[#DD5957] dark:text-dark-accent/80 border-accent dark:border-dark-accent">
                 Страницы
               </h4>
-              <ul className="flex-1 border-l-2 border-l-accent">
+              <ul
+                className="flex-1 border-l-2 border-l-accent dark:border-l-dark-accent
+dark:border-dark-accent"
+              >
                 <FooterLink href={"/"} text={"Главная"} />
                 <FooterLink href={"/profile"} text={"Профиль"} />
                 <FooterLink href={"/settings"} text={"Настройки"} />
@@ -35,25 +38,34 @@ export const Footer = () => {
               </ul>
             </div>
             <div>
-              <h4 className="text-xl text-right lg:text-left border-b-2 font-bold text-[#DD5957] border-accent">
+              <h4
+                className="text-xl text-right lg:text-left border-b-2 font-bold text-[#DD5957] border-accent dark:text-dark-accent/80
+dark:border-dark-accent"
+              >
                 Больше
               </h4>
-              <ul className="flex-1 border-l-2 border-l-accent">
+              <ul className="flex-1 border-l-2 border-l-accent dark:border-l-dark-accent">
                 <FooterLink href={GITHUB} text={"Выпуски"} />
                 <FooterLink href={GITHUB} text={"GitHub"} />
               </ul>
             </div>
             <div>
-              <h4 className="text-xl text-right lg:text-left border-b-2 font-bold text-[#DD5957] border-accent">
+              <h4
+                className="text-xl text-right lg:text-left border-b-2 font-bold text-[#DD5957] border-accent dark:text-dark-accent/80
+dark:border-dark-accent"
+              >
                 О Scrumify
               </h4>
-              <ul className="flex-1 border-l-2 border-l-accent">
+              <ul className="flex-1 border-l-2 border-l-accent dark:border-l-dark-accent ">
                 <FooterLink href={GITHUB} text={"GitHub"} />
                 <FooterLink href={TELEGRAM} text={"Telegram"} />
               </ul>
             </div>
             <div>
-              <h4 className="text-xl text-right lg:text-left border-b-2 font-bold w-full text-[#DD5957] border-accent">
+              <h4
+                className="text-xl text-right lg:text-left border-b-2 font-bold w-full text-[#DD5957] border-accent dark:text-dark-accent/80
+dark:border-dark-accent"
+              >
                 Рассылка
               </h4>
               <ul className="flex-1 text-sm">
@@ -62,7 +74,10 @@ export const Footer = () => {
                     Подпишитесь на рассылку чтобы получать свежие обновления
                     первым
                   </p>
-                  <div className="flex gap-1 lg:gap-3 rounded-lg border lg:border-2 border-accent p-1 w-fit">
+                  <div
+                    className="flex gap-1 lg:gap-3 rounded-lg border lg:border-2 border-accent dark:text-dark-main
+dark:border-dark-accent p-1 w-fit"
+                  >
                     <input
                       type="email"
                       className="outline-none w-full text-main"
@@ -100,7 +115,7 @@ export const Footer = () => {
           </Link>
         </div>
       </div>
-      <div className="flex gap-3 justify-around items-center pb-5">
+      <div className="flex gap-3 text-main justify-around items-center pb-5">
         <ThemeSwitcher variant="footer" /> <LocaleSwitcher />
       </div>
     </footer>
@@ -111,8 +126,10 @@ const FooterLink = ({ text, href }: { text: string; href: string }) => {
   return (
     <Link href={href}>
       <li className="flex items-center gap-2 lg:pr-10">
-        <div className="w-4 h-0.5 bg-accent"></div>
-        <span className="hover:text-main/80">{text}</span>
+        <div className="w-4 h-0.5 bg-accent dark:bg-dark-accent"></div>
+        <span className="hover:text-main/80 dark:hover:text-dark-main/80">
+          {text}
+        </span>
       </li>
     </Link>
   );

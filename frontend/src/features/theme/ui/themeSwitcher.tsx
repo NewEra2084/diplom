@@ -66,7 +66,7 @@ const ThemeSwitcherItem = ({
     return (
       <li
         onClick={onClick}
-        className={`${themeMain == theme ? "bg-accent dark:border-dark-accent" : ""} flex flex-col gap-2 p-2 lg:p-8 lg:w-36 border-2 justify-center items-center rounded-lg`}
+        className={`${themeMain == theme ? "bg-accent dark:bg-dark-secondary dark:border-dark-accent" : ""} flex flex-col gap-2 p-2 lg:p-8 lg:w-36 border-2 justify-center items-center rounded-lg`}
       >
         {children}
       </li>
@@ -75,7 +75,7 @@ const ThemeSwitcherItem = ({
     return (
       <li
         onClick={onClick}
-        className={`${themeMain == theme ? "bg-accent" : ""} flex flex-col gap-2 p-2 w-fit justify-center items-center rounded-lg`}
+        className={`${themeMain == theme ? "bg-accent dark:bg-dark-main" : ""} flex flex-col gap-2 p-2 w-fit justify-center items-center rounded-lg`}
       >
         {children}
       </li>

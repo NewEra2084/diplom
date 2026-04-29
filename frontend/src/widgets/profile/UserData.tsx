@@ -116,7 +116,7 @@ export const UserData = ({ className, editable = true }: Props) => {
           </div>
         </div>
         <div
-          className={`flex-2 flex flex-col ${isEdit ? "gap-10" : "gap-4"} text-base lg:text-lg pb-3 border-x-2 pt-10 relative border-x-accent pl-[5vw]`}
+          className={`flex-2 flex flex-col ${isEdit ? "gap-10" : "gap-4"} text-base lg:text-lg pb-3 border-x-2 pt-10 relative border-x-accent dark:border-x-dark-secondary pl-[5vw]`}
         >
           <DataField available={true} purpose="Почта" field="email" />
           <DataField available={true} purpose="Логин" field="login" />
@@ -126,7 +126,8 @@ export const UserData = ({ className, editable = true }: Props) => {
           <DataField
             available={false}
             options={jobTitles}
-            shown={userData?.jobTitleName || ""}
+            shown={fields.jobTitleId || ""}
+            costyl="jobTitleName"
             type="select"
             purpose="Должность"
             field="jobTitleId"
@@ -134,13 +135,15 @@ export const UserData = ({ className, editable = true }: Props) => {
           <DataField
             available={false}
             options={qualifications}
-            shown={userData?.qualificationName || ""}
+            costyl="qualificationName"
+            shown={fields.qualificationId || ""}
             type="select"
             purpose="Квалификация"
             field="qualificationId"
           />
           <DataField
             available={false}
+            costyl="role"
             type="select"
             purpose="Роль"
             field="role"

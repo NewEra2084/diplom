@@ -1,3 +1,4 @@
+import { useUserStore } from "@/entities/user/model/store";
 import { FormLabelInput } from "./FormLabelInput";
 import { FormLabelSelect } from "./FormLabelSelect";
 
@@ -5,6 +6,8 @@ type Props = {
   text: string | undefined;
   isEdit: boolean;
   purpose?: string;
+  shown?: string;
+  costyl: string;
   type?: string;
   onChange?: (value: string) => void;
   options?: { id: string; name: string }[];
@@ -15,14 +18,18 @@ export const EditableField = ({
   onChange,
   type = "text",
   text,
+  costyl,
+  shown,
   isEdit,
   options,
 }: Props) => {
+  const userData = useUserStore((state) => state.user);
   return (
-    <div className="pl-4 pr-10 flex-2">
+    <div className={`${isEdit? "" : "pl-4"} pr-10 flex-2`}>
       {isEdit ? (
         type === "text" ? (
           <FormLabelInput
+            className=""
             title={purpose || ""}
             onChange={onChange}
             value={text}
@@ -50,13 +57,13 @@ export const EditableField = ({
         )
       ) : (
         <h5>
-          {type=="select" && text?.includes("ROLE")
+          {text?.includes("ROLE")
             ? (text === "ROLE_ADMIN"
               ? "Админ"
               : text === "ROLE_MANAGER"
                 ? "Менеджер"
                 : "Сотрудник")
-            : text}
+            : (shown ? userData && userData[costyl] : text)}
         </h5>
       )}
     </div>

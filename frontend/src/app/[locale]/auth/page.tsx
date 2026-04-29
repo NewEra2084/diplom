@@ -5,6 +5,7 @@ import { useUserStore } from "@/entities/user/model/store";
 import { useRouter } from "@/i18n/navigation";
 import { auth } from "@/features/auth/endpoints";
 import { FormLabelInput } from "@/shared/ui/FormLabelInput";
+import { FormButton } from "@/shared/ui/FormButton";
 
 type fields = {
   login: string;
@@ -66,12 +67,7 @@ export default function Page() {
           }
         />
         <div className="text-accent dark:text-dark-accent">{error}</div>
-        <button
-          className="rounded-xl hover:w-full transition-all hover:animate-pulse bg-secondary text-main w-[50%] py-4"
-          type="submit"
-        >
-          Вход
-        </button>
+        <FormButton text="Вход"/>
       </form>
     </div>
   );

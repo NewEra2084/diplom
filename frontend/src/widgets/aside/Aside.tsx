@@ -27,7 +27,7 @@ export const Aside = ({ title, elements }: Props) => {
             <AsideElement
               key={item.id}
               to={item.link}
-              className={`${pathname == "/" + locale + "/settings/" + item.link ? "bg-accent hover:bg-none" : "hover:bg-accent/70"}`}
+              className={`${pathname == "/" + locale + "/settings/" + item.link ? "bg-accent dark:bg-dark-secondary hover:bg-none" : "hover:bg-accent/70 dark:hover:bg-dark-secondary/70"}`}
             >
               {item.name}
             </AsideElement>
@@ -36,7 +36,7 @@ export const Aside = ({ title, elements }: Props) => {
       )}
       <div
         onClick={() => setAsideIsOpen()}
-        className="hover:bg-accent/50 flex items-center transition-all"
+        className="hover:bg-accent/50 dark:hover:bg-dark-secondary/50 flex items-center transition-all"
       >
         {asideIsOpen ? (
           <ChevronLeft size={30} className="mx-auto" />
