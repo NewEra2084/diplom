@@ -12,7 +12,7 @@ export default function RootLayout({
 }>) {
   return (
     <html>
-      <body className="transition-all">{children}</body>
+      <body className="transition-all selection:bg-accent/50">{children}</body>
     </html>
   );
 }

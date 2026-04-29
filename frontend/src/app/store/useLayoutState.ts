@@ -9,7 +9,7 @@ type StateT = {
 
 export const useLayoutState = create<StateT>((set)=>({
   asideIsOpen: true,
-  viewport: window.innerWidth,
+  viewport: typeof window !== 'undefined' ? window.innerWidth : 1024,
   setAsideIsOpen: ()=>{
     set((prev)=>({...prev, asideIsOpen: !prev.asideIsOpen}))
   }
