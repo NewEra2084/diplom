@@ -8,6 +8,7 @@ import { cookies } from "next/headers";
 import { ThemeInitializer } from "@/features/theme";
 import { QueryProvider } from "../providers/QueryProvider";
 import { getMessages } from "next-intl/server";
+import MotionProvider from "../providers/MotionProvider";
 
 export default async function LocaleLayout({
   children,
@@ -27,12 +28,14 @@ export default async function LocaleLayout({
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <QueryProvider>
-        <ThemeInitializer serverTheme={theme} />
-        <Header />
-        <main className="px-10 lg:px-25 py-[min(10vw,50px)] dark:bg-dark-main dark:text-dark-accent transition-all duration-700">
-          {children}
-        </main>
-        <Footer />
+        <MotionProvider>
+          <ThemeInitializer serverTheme={theme} />
+          <Header />
+          <main className="px-10 lg:px-25 py-[min(10vw,50px)] dark:bg-dark-main dark:text-dark-accent transition-all duration-700">
+            {children}
+          </main>
+          <Footer />
+        </MotionProvider>
       </QueryProvider>
     </NextIntlClientProvider>
   );

@@ -12,7 +12,6 @@ type Props = {
   shown?: string;
   available: boolean;
   costyl?: "qualificationName" | "jobTitleName" | "role";
-  costyl2: ""
   type?: "text" | "select";
   options?: { id: string; name: string }[];
 };
