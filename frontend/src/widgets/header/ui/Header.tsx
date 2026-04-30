@@ -5,13 +5,15 @@ import { Menu, X } from "lucide-react";
 import { BurgerMenu } from "../components/BurgerMenu";
 import Link from "next/link";
 import { HeaderStore } from "../store/HeaderStore";
+import { motion } from "motion/react";
+import { forwardRef } from "react";
 
-export const Header = () => {
+export const Header = forwardRef<HTMLElement>(({},ref) => {
   const isOpen = HeaderStore((store)=>store.isOpen);
   const setIsOpen = HeaderStore((store)=>store.setIsOpen);
 
   return (
-    <header className="relative hover:shadow-lg select-none py-2 lg:p-0 text-lg shadow-secondary flex justify-between lg:justify-normal items-center bg-secondary dark:bg-dark-secondary text-main dark:text-dark-main lg:px-20 px-10">
+    <header ref={ref} className="relative hover:shadow-lg select-none py-2 lg:p-0 text-lg shadow-secondary flex justify-between lg:justify-normal items-center bg-secondary dark:bg-dark-secondary text-main dark:text-dark-main lg:px-20 px-10">
       <Link href="/">
         <Logo />
       </Link>
@@ -35,4 +37,8 @@ export const Header = () => {
       {isOpen.is && !isOpen.column && <BurgerMenu />}
     </header>
   );
-};
+});
+
+Header.displayName = "Header";
+
+export const MHeader = motion(Header);

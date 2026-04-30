@@ -1,9 +1,14 @@
 "use client";
 import { useAuthGuard } from "@/features/auth/useAuthGuard";
 import { useUserStore } from "@/entities/user/model/store";
-import { useEffect } from "react";
-import { UserData } from "@/widgets/profile/UserData";
+import { lazy, Suspense, useEffect } from "react";
 import { CompanyData } from "@/widgets/profileCompany/CompanyData";
+
+const UserData = lazy(() =>
+  import("@/widgets/profile/UserData").then((module) => ({
+    default: module.UserData,
+  })),
+);
 
 export default function Page() {
   useAuthGuard(["ROLE_EMPLOYEE", "ROLE_ADMIN", "ROLE_MANAGER"]);
@@ -18,7 +23,9 @@ export default function Page() {
   }, [getPoints, getUserData]);
   return (
     <>
-      <UserData />
+      <Suspense fallback={<div>Loading...</div>}>
+        <UserData />
+      </Suspense>
       <CompanyData />
     </>
   );

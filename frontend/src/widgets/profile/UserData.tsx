@@ -3,7 +3,7 @@ import { useProfileStore } from "../../app/[locale]/profile/store/profileStore";
 import { useUserStore } from "@/entities/user/model/store";
 import { useEffect, useState } from "react";
 import { DataField } from "./components/DataField";
-import { getQualifications, getSpreadQualifications } from "@/shared/api/qualificationsEndpoints";
+import { getSpreadQualifications } from "@/shared/api/qualificationsEndpoints";
 import { getJobTitles } from "@/shared/api/jobTitlesEndpoints";
 
 type Props = {
@@ -75,6 +75,7 @@ export const UserData = ({ className, editable = true }: Props) => {
       });
     })();
   }, [setFields, userData]);
+  
 
   useEffect(() => {
     (async () => {
