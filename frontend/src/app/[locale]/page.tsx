@@ -163,7 +163,7 @@ export default function Page() {
           </Block>
         </AutoScrollCarousel>
       <Link
-        href={"get"}
+        href={"buy"}
         className="lg:hidden mx-auto flex rounded-2xl gap-3 items-center justify-center border-2 border-accent dark:border-dark-accent p-5 w-fit"
       >
         <span className="text-xl">Получить</span>
