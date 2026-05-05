@@ -1,7 +1,5 @@
-"use client";
-
 import { PencilOff, SquarePen } from "lucide-react";
-import { useProfileStore } from "@/app/[locale]/profile/store/profileStore";
+import { useProfileStore } from "./store/profileStore";
 import { UserStore } from "@/entities/User/model/store";
 import { useEffect, useState } from "react";
 import { DataField } from "./components/DataField";
@@ -30,21 +28,19 @@ type jobTitlesOption = {
   name: string;
 };
 function isUserApproved(role: role) {
-    const userData = UserStore((state) => state.user);
-    return userData?.rolesName.includes(role) || false;
-  }
+  const userData = UserStore((state) => state.user);
+  return userData?.rolesName.includes(role) || false;
+}
 
-  function userRoleByName() {
-    const userData = UserStore((state) => state.user);
+function userRoleByName() {
+  const userData = UserStore((state) => state.user);
 
-    const roleName = rolesType.find(
-      (item) => item.id === userData?.rolesName[0],
-    )?.name;
-    console.log(roleName);
-    
+  const roleName = rolesType.find(
+    (item) => item.id === userData?.rolesName[0],
+  )?.name;
 
-    return roleName || "Employee";
-  }
+  return roleName || "Employee";
+}
 const Validate = () => {};
 
 const rolesType = [
@@ -104,8 +100,6 @@ export const UserData = ({ className, editable = true }: Props) => {
       }
     })();
   }, []);
-
-  
 
   return (
     <section className={className}>

@@ -1,7 +1,4 @@
-import {
-  Fields,
-  useProfileStore,
-} from "@/app/[locale]/profile/store/profileStore";
+import { Fields, useProfileStore } from "@/widgets/profile/store/profileStore";
 import { UserStore } from "@/entities/User/model/store";
 import { FormLabelSelect } from "@/shared/ui/FormLabelSelect";
 
