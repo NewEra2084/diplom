@@ -1,6 +1,6 @@
 "use client";
 import { useAuthGuard } from "@/features/auth/useAuthGuard";
-import { useUserStore } from "@/entities/User/model/store";
+import { UserStore } from "@/entities/User/model/store";
 import { lazy, Suspense, useEffect } from "react";
 import { CompanyData } from "@/widgets/profileCompany/CompanyData";
 
@@ -13,9 +13,8 @@ const UserData = lazy(() =>
 export default function Page() {
   useAuthGuard(["ROLE_EMPLOYEE", "ROLE_ADMIN", "ROLE_MANAGER"]);
 
-  const getPoints = useUserStore((state) => state.getPoints);
-
-  const getUserData = useUserStore((state) => state.fetchUser);
+  const getPoints = UserStore((state) => state.getPoints);
+  const getUserData = UserStore((state) => state.getUser);
 
   useEffect(() => {
     getPoints();

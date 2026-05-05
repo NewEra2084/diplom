@@ -1,6 +1,6 @@
 import { PencilOff, SquarePen } from "lucide-react";
 import { useProfileStore } from "@/app/[locale]/profile/store/profileStore";
-import { useUserStore } from "@/entities/User/model/store";
+import { UserStore } from "@/entities/User/model/store";
 import { useEffect, useState } from "react";
 import { DataField } from "./components/DataField";
 import {
@@ -35,8 +35,8 @@ export const UserData = ({ className, editable = true }: Props) => {
     [],
   );
   const [jobTitles, setJobTitles] = useState<jobTitlesOption[]>([]);
-  const points = useUserStore((state) => state.points);
-  const userData = useUserStore((state) => state.user);
+  const points = UserStore((state) => state.points);
+  const userData = UserStore((state) => state.user);
   useEffect(() => {
     (async () => {
       setFields({

@@ -15,7 +15,9 @@ export type User = {
 export type useUser = {
   user: User | null;
   points: number;
-  fetchUser: () => Promise<void>;
-  getPoints: () => Promise<void>;
+  setUser: (data: User) => void;
+  getUser: () => User;
+  setPoints: (data: number) => void;
+  getPoints: () => number;
   logout: () => void;
 };
