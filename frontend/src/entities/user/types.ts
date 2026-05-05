@@ -5,6 +5,7 @@ export type User = {
   email: string;
   firstName: string;
   lastName: string;
+  password?: string;
   patronymic: string;
   jobTitleName: string;
   qualificationName: string;
