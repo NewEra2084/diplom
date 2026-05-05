@@ -20,8 +20,7 @@ type ProfileStore = {
   changeField: (field: string, value: string) => void;
 };
 
-export const useProfileStore = create<ProfileStore>()(
-  persist(
+export const useProfileStore = create<ProfileStore>(
     (set) => ({
       fields: {
         email: "",
@@ -48,6 +47,4 @@ export const useProfileStore = create<ProfileStore>()(
         
       },
     }),
-    { name: "profileData" },
-  ),
-);
+  );

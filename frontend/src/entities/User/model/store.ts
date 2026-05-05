@@ -1,16 +1,19 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { User, useUser } from "./types";
+import { useUser } from "./types";
+import { fetchUserData, fetchUserPoints } from "../api/endpoints";
 
 export const UserStore = create<useUser>()(
   devtools((set, get) => ({
     user: null,
     points: 0,
-    setUser: (data: User) => {
+    setUser: async () => {
+      const data = await fetchUserData();
       set((prev) => ({ ...prev, user: data }));
     },
     getUser: () => get().user,
-    setPoints: (data: number) => {
+    setPoints: async () => {
+      const data = await fetchUserPoints();
       set({ points: data });
     },
     getPoints: () => get().points,

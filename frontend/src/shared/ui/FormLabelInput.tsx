@@ -20,12 +20,12 @@ export const FormLabelInput = ({
   const [inputState, setInputState] = useState(value);
   const id = useId();
   return (
-    <div className="relative w-full">
+    <div className={`${className} relative w-full`}>
       <input
         id={id}
         type={type === "text" ? "text" : visible ? "text" : "password"}
         value={value}
-        className={"peer border-2 border-secondary dark:border-dark-secondary focus:border-dark-accent dark:focus:border-dark-secondary focus:bg-secondary dark:focus:bg-dark-main dark:focus:text-dark-secondary focus:text-main outline-none rounded-lg py-2 px-4 w-full text-secondary dark:text-dark-accent"+className}
+        className={`${className} peer border-2 border-secondary dark:border-dark-secondary focus:border-dark-accent dark:focus:border-dark-secondary focus:bg-secondary dark:focus:bg-dark-main dark:focus:text-dark-secondary focus:text-main outline-none rounded-lg py-2 px-4 w-full text-secondary dark:text-dark-accent`}
         onChange={(e: ChangeEvent<HTMLInputElement>) => {
           if (onChange) onChange(e.target.value);
           setInputState(e.target.value);

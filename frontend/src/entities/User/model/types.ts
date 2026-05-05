@@ -1,4 +1,6 @@
-export type roles = ("ROLE_EMPLOYEE" | "ROLE_ADMIN" | "ROLE_MANAGER")[];
+export type roles = role[];
+export type role = "ROLE_EMPLOYEE" | "ROLE_ADMIN" | "ROLE_MANAGER";
+
 export type User = {
   id: string;
   login: string;
@@ -15,9 +17,9 @@ export type User = {
 export type useUser = {
   user: User | null;
   points: number;
-  setUser: (data: User) => void;
+  setUser: () => void;
   getUser: () => User;
-  setPoints: (data: number) => void;
+  setPoints: () => void;
   getPoints: () => number;
   logout: () => void;
 };

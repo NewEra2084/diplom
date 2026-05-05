@@ -1,3 +1,5 @@
+"use client";
+
 import { PencilOff, SquarePen } from "lucide-react";
 import { useProfileStore } from "@/app/[locale]/profile/store/profileStore";
 import { UserStore } from "@/entities/User/model/store";
@@ -9,6 +11,10 @@ import {
 } from "@/entities/Qualification/lib/utils";
 import { jobIdFromName } from "@/entities/JobTitle/lib/utils";
 import { getJobTitles } from "@/entities/JobTitle/api/endpoints";
+import { Points } from "./components/Points";
+import { DataSelectField } from "./components/DataSelectField";
+import { Avatar } from "./components/Avatar";
+import { role } from "@/entities/User/model/types";
 
 type Props = {
   className?: string;
@@ -23,8 +29,29 @@ type jobTitlesOption = {
   id: string;
   name: string;
 };
+function isUserApproved(role: role) {
+    const userData = UserStore((state) => state.user);
+    return userData?.rolesName.includes(role) || false;
+  }
 
+  function userRoleByName() {
+    const userData = UserStore((state) => state.user);
+
+    const roleName = rolesType.find(
+      (item) => item.id === userData?.rolesName[0],
+    )?.name;
+    console.log(roleName);
+    
+
+    return roleName || "Employee";
+  }
 const Validate = () => {};
+
+const rolesType = [
+  { id: "ROLE_ADMIN", name: "Admin" },
+  { id: "ROLE_MANAGER", name: "Manager" },
+  { id: "ROLE_EMPLOYEE", name: "Employee" },
+];
 
 export const UserData = ({ className, editable = true }: Props) => {
   const setIsEdit = useProfileStore((state) => state.changeIsEdit);
@@ -35,9 +62,12 @@ export const UserData = ({ className, editable = true }: Props) => {
     [],
   );
   const [jobTitles, setJobTitles] = useState<jobTitlesOption[]>([]);
-  const points = UserStore((state) => state.points);
   const userData = UserStore((state) => state.user);
+  const roleName = userRoleByName();
+
   useEffect(() => {
+    if (!editable) return;
+
     (async () => {
       setFields({
         login: userData?.login || "",
@@ -50,10 +80,10 @@ export const UserData = ({ className, editable = true }: Props) => {
           userData?.qualificationName || "",
           userData?.jobTitleName || "",
         ),
-        role: userData?.rolesName[0] || "",
+        role: roleName,
       });
     })();
-  }, [setFields, userData]);
+  }, [setFields, userData, editable, roleName]);
 
   useEffect(() => {
     (async () => {
@@ -75,55 +105,40 @@ export const UserData = ({ className, editable = true }: Props) => {
     })();
   }, []);
 
+  
+
   return (
     <section className={className}>
       <h2 className="text-2xl lg:text-3xl text-center mb-5 lg:mb-0 lg:text-left">
         Профиль
       </h2>
       <div className="flex flex-col lg:flex-row">
-        <div className="flex-1 flex justify-center items-center">
-          <div className="rounded-full relative group bg-gray-500 peer w-36 h-36 lg:w-56 lg:h-56 mb-10">
-            <div className="absolute rounded-full inset-0 bg-secondary/10 hidden group-hover:flex items-center justify-center">
-              <SquarePen
-                size={45}
-                onClick={() => {
-                  setIsEdit(true);
-                  Validate();
-                }}
-              />
-            </div>
-          </div>
-        </div>
+        <Avatar />
         <div
           className={`flex-2 flex flex-col ${isEdit ? "gap-10" : "gap-4"} text-base lg:text-lg pb-3 border-x-2 pt-10 relative border-x-accent dark:border-x-dark-secondary pl-[5vw]`}
         >
-          <DataField available={true} purpose="Почта" field="email" />
-          <DataField available={true} purpose="Логин" field="login" />
-          <DataField available={true} purpose="Имя" field="firstName" />
-          <DataField available={true} purpose="Фамилия" field="lastName" />
-          <DataField available={true} purpose="Отчество" field="patronymic" />
-          <DataField
-            available={false}
+          <DataField purpose="Почта" field="email" />
+          <DataField purpose="Логин" field="login" />
+          <DataField purpose="Имя" field="firstName" />
+          <DataField purpose="Фамилия" field="lastName" />
+          <DataField purpose="Отчество" field="patronymic" />
+          <DataSelectField
+            available={isUserApproved("ROLE_ADMIN")}
             options={jobTitles}
-            shown={fields.jobTitleId || ""}
-            costyl="jobTitleName"
-            type="select"
+            trueName="jobTitleName"
             purpose="Должность"
             field="jobTitleId"
           />
-          <DataField
-            available={false}
+          <DataSelectField
+            available={isUserApproved("ROLE_ADMIN")}
             options={qualifications}
-            costyl="qualificationName"
-            shown={fields.qualificationId || ""}
-            type="select"
+            trueName="qualificationName"
             purpose="Квалификация"
             field="qualificationId"
           />
-          <DataField
+          <DataSelectField
             available={false}
-            costyl="role"
-            type="select"
+            options={rolesType}
             purpose="Роль"
             field="role"
           />
@@ -141,16 +156,7 @@ export const UserData = ({ className, editable = true }: Props) => {
               ))}
           </div>
         </div>
-        <div className="p-10 flex flex-col justify-center items-center">
-          <span className="text-lg mb-4">Очки</span>
-          <div className={`text-2xl`}>
-            <div
-              className={`flex justify-center items-center inset-0 rounded-full outline-8 p-10 ${points > 100 ? "outline-accent" : points > 50 ? "outline-accent/50" : "outline-accent/20"}`}
-            >
-              <span className="text-3xl">{points}</span>
-            </div>
-          </div>
-        </div>
+        <Points />
       </div>
     </section>
   );

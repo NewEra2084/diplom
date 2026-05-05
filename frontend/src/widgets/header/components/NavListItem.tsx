@@ -1,9 +1,10 @@
 "use client";
 import { User } from "@/entities/User/model/types";
-import { Column } from "./Navigation";
+
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { HeaderStore } from "../store/HeaderStore";
+import { Column } from "../store/types";
 
 type Props = {
   userData: User;

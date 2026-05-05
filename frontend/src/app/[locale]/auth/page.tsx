@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useUserStore } from "@/entities/User/model/store";
+import { UserStore } from "@/entities/User/model/store";
 import { useRouter } from "@/i18n/navigation";
 import { auth } from "@/features/auth/endpoints";
 import { FormLabelInput } from "@/shared/ui/FormLabelInput";
@@ -18,7 +18,7 @@ export default function Page() {
     password: "",
   });
   const [error, setError] = useState<null | string>(null);
-  const fetchUser = useUserStore((store) => store.fetchUser);
+  const setUser = UserStore((store) => store.setUser);
   const router = useRouter();
 
   const handleSubmit = async () => {
@@ -36,7 +36,7 @@ export default function Page() {
       return;
     }
 
-    fetchUser();
+    setUser();
     router.replace("/");
   };
 

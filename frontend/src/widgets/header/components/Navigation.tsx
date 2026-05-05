@@ -1,4 +1,4 @@
-import { useUserStore } from "@/entities/User/model/store";
+import { UserStore } from "@/entities/User/model/store";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { NavListItem } from "./NavListItem";
@@ -10,16 +10,18 @@ export type Props = {
 };
 
 export const Navigation = ({ className }: Props) => {
-  const userData = useUserStore((store) => store.user);
-  const fetchUsers = useUserStore((user) => user.fetchUser);
+  const userData = UserStore((store) => store.user);
+  const setUser = UserStore((store) => store.setUser);
+  const setPoints = UserStore((store) => store.setPoints);
   const t = useTranslations("Header");
-  const logout = useUserStore((store) => store.logout);
+  const logout = UserStore((store) => store.logout);
   // Храним только ID открытого пункта, а не массив статусов
   const [openItemId, setOpenItemId] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
+    setUser();
+    setPoints();
+  }, [setPoints, setUser]);
   useEffect(() => {}, [userData]);
 
   const toggleItem = (title: string) => {

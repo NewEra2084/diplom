@@ -5,17 +5,19 @@ type Props = {
   onChange: (e: string) => void;
   children: ReactNode[];
   title: string;
+  className?: string
 };
 
 export const FormLabelSelect = ({
   value,
   title,
   onChange,
+  className,
   children,
 }: Props) => {
   const id = useId();
   return (
-    <div className="relative w-full">
+    <div className={`${className} relative w-full`}>
       <select
       id={id}
         className="w-full border-2 py-2 outline-none border-secondary dark:border-dark-secondary rounded-xl px-5"
