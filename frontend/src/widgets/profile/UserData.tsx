@@ -1,10 +1,14 @@
 import { PencilOff, SquarePen } from "lucide-react";
-import { useProfileStore } from "../../app/[locale]/profile/store/profileStore";
-import { useUserStore } from "@/entities/user/model/store";
+import { useProfileStore } from "@/app/[locale]/profile/store/profileStore";
+import { useUserStore } from "@/entities/User/model/store";
 import { useEffect, useState } from "react";
 import { DataField } from "./components/DataField";
-import { getSpreadQualifications } from "@/shared/api/qualificationsEndpoints";
-import { getJobTitles } from "@/shared/api/jobTitlesEndpoints";
+import {
+  getSpreadQualifications,
+  qualificationIdFromName,
+} from "@/entities/Qualification/lib/utils";
+import { jobIdFromName } from "@/entities/JobTitle/lib/utils";
+import { getJobTitles } from "@/entities/JobTitle/api/endpoints";
 
 type Props = {
   className?: string;
@@ -21,34 +25,6 @@ type jobTitlesOption = {
 };
 
 const Validate = () => {};
-
-const jobIdFromName = async (name: string): Promise<string> => {
-  const response = await getJobTitles();
-  if (response) {
-    const res = response.find((item) => item.name === name);
-    if (res) {
-      return res.id;
-    } else {
-      throw new Error();
-    }
-  } else {
-    throw new Error();
-  }
-};
-const qualificationIdFromName = async (name: string, jobTitleName:string): Promise<string> => {
-  const jobTitleId = await jobIdFromName(jobTitleName)
-  const response = await getSpreadQualifications(jobTitleId);
-  if (response) {
-    const res = response.find((item) => item.name === name);
-    if (res) {
-      return res.id;
-    } else {
-      throw new Error();
-    }
-  } else {
-    throw new Error();
-  }
-};
 
 export const UserData = ({ className, editable = true }: Props) => {
   const setIsEdit = useProfileStore((state) => state.changeIsEdit);
@@ -70,12 +46,14 @@ export const UserData = ({ className, editable = true }: Props) => {
         lastName: userData?.lastName || "",
         patronymic: userData?.patronymic || "",
         jobTitleId: await jobIdFromName(userData?.jobTitleName || ""),
-        qualificationId: await qualificationIdFromName(userData?.qualificationName || "", userData?.jobTitleName || ""),
+        qualificationId: await qualificationIdFromName(
+          userData?.qualificationName || "",
+          userData?.jobTitleName || "",
+        ),
         role: userData?.rolesName[0] || "",
       });
     })();
   }, [setFields, userData]);
-  
 
   useEffect(() => {
     (async () => {

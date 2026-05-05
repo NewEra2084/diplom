@@ -1,5 +1,5 @@
 "use client";
-import { User } from "@/entities/user/types";
+import { User } from "@/entities/User/model/types";
 import { Column } from "./Navigation";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";

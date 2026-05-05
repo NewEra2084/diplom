@@ -1,4 +1,4 @@
-import { useUserStore } from "@/entities/user/model/store";
+import { useUserStore } from "@/entities/User/model/store";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { NavListItem } from "./NavListItem";

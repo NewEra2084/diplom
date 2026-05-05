@@ -1,6 +1,6 @@
 "use client";
 import { useAuthGuard } from "@/features/auth/useAuthGuard";
-import { useUserStore } from "@/entities/user/model/store";
+import { useUserStore } from "@/entities/User/model/store";
 import { lazy, Suspense, useEffect } from "react";
 import { CompanyData } from "@/widgets/profileCompany/CompanyData";
 

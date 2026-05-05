@@ -1,7 +1,7 @@
 import { getTemplate } from "@/shared/api/client";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { User, useUser } from "../types";
+import { User, useUser } from "./types";
 
 export const useUserStore = create<useUser>()(
   devtools((set) => ({
@@ -14,7 +14,7 @@ export const useUserStore = create<useUser>()(
     },
     getPoints: async () => {
       const response = await getTemplate("/employee/get_points");
-      const data = response.data as {points:number};
+      const data = response.data as { points: number };
       set({ points: data.points });
     },
     logout: () => {

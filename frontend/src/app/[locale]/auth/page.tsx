@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useUserStore } from "@/entities/user/model/store";
+import { useUserStore } from "@/entities/User/model/store";
 import { useRouter } from "@/i18n/navigation";
 import { auth } from "@/features/auth/endpoints";
 import { FormLabelInput } from "@/shared/ui/FormLabelInput";
@@ -67,7 +67,7 @@ export default function Page() {
           }
         />
         <div className="text-accent dark:text-dark-accent">{error}</div>
-        <FormButton text="Вход"/>
+        <FormButton text="Вход" />
       </form>
     </div>
   );

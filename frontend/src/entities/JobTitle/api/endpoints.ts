@@ -1,10 +1,5 @@
-import { getTemplate } from "./client";
-
-export type JobTitle = {
-  id: string;
-  name: string;
-  description: string;
-};
+import { getTemplate } from "@/shared/api/client";
+import { JobTitle } from "../model/types";
 
 export const getJobTitles = async () => {
   const { data, status } = await getTemplate<JobTitle[]>(
