@@ -59,7 +59,7 @@ export const UserData = ({ className, editable = true }: Props) => {
   );
   const [jobTitles, setJobTitles] = useState<jobTitlesOption[]>([]);
   const userData = UserStore((state) => state.user);
-  const roleName = userRoleByName();
+  const roleName = userRoleByName();  
 
   useEffect(() => {
     if (!editable) return;

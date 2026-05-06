@@ -17,6 +17,9 @@ export const qualificationIdFromName = async (
   name: string,
   jobTitleName: string,
 ): Promise<string> => {
+  if (name === "" || "unknown") {
+    return "";
+  }
   const jobTitleId = await jobIdFromName(jobTitleName);
   const response = await getSpreadQualifications(jobTitleId);
   if (response) {

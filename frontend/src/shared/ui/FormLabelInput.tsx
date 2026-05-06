@@ -6,7 +6,7 @@ type Props = {
   value?: string;
   className?: string;
   type?: "text" | "password";
-  onChange?: (evalue: string) => void;
+  onChange?: (evalue: string | ChangeEvent<HTMLInputElement>) => void;
 };
 
 export const FormLabelInput = ({
