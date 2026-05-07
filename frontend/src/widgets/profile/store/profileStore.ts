@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 
 export type Fields = {
   email: string;
@@ -10,6 +9,7 @@ export type Fields = {
   jobTitleId: string;
   qualificationId: string;
   role: string;
+  password?: string;
 };
 
 type ProfileStore = {
@@ -31,6 +31,7 @@ export const useProfileStore = create<ProfileStore>(
         jobTitleId: "",
         qualificationId: "",
         role: "",
+        password: "",
       },
       isEdit: false,
       changeIsEdit: (value) => {

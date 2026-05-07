@@ -12,7 +12,7 @@ export const AsideElement = ({ className, to, children }: Props) => {
   return (
     <Link
       href={to}
-      className={`py-5 px-20 mb-5 rounded-lg ${className}`}
+      className={`py-5 px-20 mb-5 text-center rounded-lg ${className}`}
     >
       {children}
     </Link>

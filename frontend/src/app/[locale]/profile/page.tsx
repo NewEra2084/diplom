@@ -7,7 +7,7 @@ export default function Page() {
   useAuthGuard(["ROLE_EMPLOYEE", "ROLE_ADMIN", "ROLE_MANAGER"]);
   return (
     <>
-      <UserData />
+      <UserData editable={true}/>
       <CompanyData />
     </>
   );

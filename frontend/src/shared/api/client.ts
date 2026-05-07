@@ -39,6 +39,39 @@ api.interceptors.response.use(
   },
 );
 
+const deleteTemplate = async (
+  url: string,
+  contentType = "application/json",
+) => {
+  try {
+    const { data, status } = await api.delete(url, {
+      headers: {
+        "Content-Type": contentType
+      },
+    });
+    
+    return { data: data, status: status };
+  } catch (error) {
+    throw error;
+  }
+};
+const putTemplate = async (
+  url: string,
+  info = {},
+  contentType = "application/json",
+) => {
+  try {
+    const { data, status } = await api.put(url, info, {
+      headers: {
+        "Content-Type": contentType
+      },
+    });
+    
+    return { data: data, status: status };
+  } catch (error) {
+    throw error;
+  }
+};
 const postTemplate = async (
   url: string,
   info = {},
@@ -70,4 +103,4 @@ const getTemplate = async <T>(url: string, contentType = "application/json") => 
   }
 };
 
-export { postTemplate, getTemplate };
+export { postTemplate, getTemplate, deleteTemplate, putTemplate };

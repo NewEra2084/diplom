@@ -12,13 +12,13 @@ export const DataField = ({ field, available = true, purpose }: Props) => {
   const changeField = useProfileStore((state) => state.changeField);
   const isEdit = useProfileStore((state) => state.isEdit);
   const fields = useProfileStore((state) => state.fields);
-
+  
   return (
     <div className="flex h-8">
       {(!isEdit || !available) && <h5 className="flex-1">{purpose}:</h5>}
       {available && isEdit ? (
         <FormLabelInput
-          className="pr-10 flex-2"
+          className="flex-2"
           title={purpose || ""}
           onChange={(value: string) => {
             changeField(field, value);

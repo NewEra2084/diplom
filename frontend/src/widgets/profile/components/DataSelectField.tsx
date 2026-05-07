@@ -31,7 +31,7 @@ export const DataSelectField = ({
       {available && isEdit ? (
         <FormLabelSelect
           title={purpose || "string"}
-          className={`pr-10 flex-2`}
+          className={`flex-2`}
           value={fields[field] || ""}
           onChange={(value: string) => {
             changeField(field, value);
