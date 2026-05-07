@@ -22,7 +22,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
         JOIN FETCH e.roles
         LEFT JOIN FETCH e.qualification eq
         LEFT JOIN FETCH eq.jobTitle
-        WHERE login = :login
+        WHERE e.login = :login
         """)
     Optional<Employee> findByLoginWithRolesAndQualificationAndJobTitle(String login);
 
@@ -45,4 +45,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
     boolean existsByQualificationId(UUID qualificationId);
 
     boolean existsByIdAndRoles_Name(UUID id, String name);
+
+    Optional<Employee> findByIdAndCompany(UUID id, Company company);
 }
