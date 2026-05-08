@@ -1,0 +1,193 @@
+import { useLayoutState } from "@/app/store/useLayoutState";
+import { getProjects } from "@/entities/Project/api/endpoints";
+import { addTask, getTaskCategories } from "@/entities/Task/api/endpoints";
+import { User } from "@/entities/User/model/types";
+import { Pencil, PencilOff, Search, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+
+type Props = {
+  deleteItem: (id: string) => Promise<boolean>;
+  item: any;
+  manager: User;
+  title: string;
+  editedState: [
+    string | null,
+    React.Dispatch<React.SetStateAction<string | null>>,
+  ];
+  listState: [any[], React.Dispatch<React.SetStateAction<any[]>>];
+  children?: React.ReactNode;
+};
+
+export const ListAllItem = ({
+  item,
+  deleteItem,
+  editedState,
+  listState,
+  manager,
+  children,
+  title,
+  setProjects
+}: Props) => {
+  const [edited, setEdited] = editedState;
+  const [addTask4, setAddTask] = useState(false);
+  const [categories, setCategories] = useState<
+    { name: string; description: string }[]
+  >([]);
+
+  const [fields, setFields] = useState({
+    name: "",
+    description: "",
+    numberOfPoints: 1,
+    deadline: "",
+    projectId: item.id,
+    taskCategoryId: "",
+  });
+  const setW = useLayoutState((state) => state.setWorkerAdded);
+
+  useEffect(() => {
+    (async () => {
+      const a = await getTaskCategories();
+      if (a) {
+        setCategories(a);
+        setFields((prev) => ({ ...prev, taskCategoryId: a[0].id }));
+      }
+    })();
+    setW(false);
+  }, [setW]);
+
+  const [_, setItems] = listState;
+  const Validate = async (fields) => {
+    addTask(fields);
+    setW(true);
+    setAddTask(() => false);
+    const prjs = await getProjects();
+    setProjects((prev) => prjs || prev);
+  };
+  return (
+    <div className="w-full flex flex-col justify-between">
+      <div
+        key={item.id}
+        className="p-2 relative w-full rounded-t-xl border-2 border-secondary flex justify-between items-center"
+      >
+        {edited !== item.id ? (
+          <div className="flex gap-10 items-center">
+            <h4>{title}</h4>
+            <h4>Менеджер: {manager?.firstName + " " + manager?.lastName}</h4>
+            <button
+              className="p-2 border-2 border-secondary rounded-xl"
+              onClick={() => setAddTask((prev) => !prev)}
+            >
+              + Добавить задачу
+            </button>
+          </div>
+        ) : (
+          <div className="flex gap-3">
+            {/* todo: update */}
+            <input></input>
+          </div>
+        )}
+        <div
+          className={`p-2 ${edited === item.id ? "absolute top-1 right-2" : "block"} rounded-xl border-2 border-secondary flex items-center justify-center gap-2`}
+        >
+          {edited === item.id ? (
+            <PencilOff onClick={() => setEdited(null)} />
+          ) : (
+            <Pencil onClick={() => setEdited(item.id)} />
+          )}
+          <Trash2
+            onClick={async () => {
+              const success = await deleteItem(item.id);
+              if (success) {
+                setItems((prev) =>
+                  prev.filter((item2) => item.id !== item2.id),
+                );
+              }
+            }}
+          ></Trash2>
+        </div>
+      </div>
+      {addTask4 && (
+        <form
+          className="border-x-2 border-b-2 flex flex-col gap-3 border-secondary p-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            Validate(fields);
+          }}
+        >
+          <div className="flex gap-3">
+            <input
+              type="text"
+              className="p-2 border-2 rounded-xl border-secondary"
+              placeholder="Название"
+              value={fields.name}
+              onChange={(e) =>
+                setFields((prev) => ({ ...prev, name: e.target.value }))
+              }
+            />
+            <input
+              type="text"
+              className="p-2 border-2 rounded-xl border-secondary"
+              placeholder="Описание"
+              value={fields.description}
+              onChange={(e) =>
+                setFields((prev) => ({ ...prev, description: e.target.value }))
+              }
+            />
+            <input
+              type="date"
+              className="p-2 border-2 rounded-xl border-secondary"
+              placeholder="Дэдлайн"
+              value={fields.deadline}
+              onChange={(e) =>
+                setFields((prev) => ({ ...prev, deadline: e.target.value }))
+              }
+            />
+            <select
+              className="p-2 border-2 rounded-xl border-secondary"
+              value={fields.numberOfPoints}
+              onChange={(e) =>
+                setFields((prev) => ({
+                  ...prev,
+                  numberOfPoints: parseInt(e.target.value),
+                }))
+              }
+            >
+              <option value={1}>1</option>
+              <option value={2}>2</option>
+              <option value={3}>3</option>
+              <option value={5}>5</option>
+              <option value={8}>8</option>
+              <option value={13}>13</option>
+            </select>
+            <select
+              className="p-2 border-2 rounded-xl border-secondary"
+              value={fields.taskCategoryId}
+              onChange={(e) =>
+                setFields((prev) => ({
+                  ...prev,
+                  taskCategoryId: e.target.value,
+                }))
+              }
+            >
+              {categories.map((item) => (
+                <option value={item.id} key={item.id}>
+                  {item.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <input
+            type="submit"
+            className="p-2 border w-full rounded-xl border-secondary"
+            value={"Создать"}
+          />
+        </form>
+      )}
+      {children && (
+        <div className="p-2 rounded-b-xl border-2 border-t-0 border-secondary flex flex-col gap-3 max-h-[50vh] overflow-y-scroll">
+          {children}
+        </div>
+      )}
+    </div>
+  );
+};

@@ -7,14 +7,19 @@ import {
   deleteQualifications,
   getQualifications,
 } from "@/entities/Qualification/api/endpoints";
-import {  Qualifications } from "@/entities/Qualification/model/types";
+import { Qualifications } from "@/entities/Qualification/model/types";
+import {
+  addTaskCategory,
+  getTaskCategories,
+} from "@/entities/Task/api/endpoints";
 import { ListItem } from "@/widgets/ListItem";
 import { ListPanel } from "@/widgets/ListPanel/ListPanel";
 import { useEffect, useState } from "react";
 
 export default function Page() {
-  const [qualifications, setQualifications] = useState<Qualifications[]>([]);
-  const [jobs, setJobs] = useState<JobTitle[]>([]);
+  const [qualifications, setQualifications] = useState<
+    { name: string; description: string }[]
+  >([]);
 
   const [fields, setFields] = useState([
     {
@@ -24,28 +29,25 @@ export default function Page() {
       type: "text",
       validate: 3,
     },
-    { name: "description", placeholder: "Работа", value: "", type: "select" },
+    {
+      name: "description",
+      placeholder: "Описание",
+      value: "",
+      type: "text",
+      validate: 10,
+    },
   ]);
   const [isOpen, setIsOpen] = useState(false);
   const [edited, setEdited] = useState<string | null>(null);
   const workerA = useLayoutState((state) => state.workerAdded);
   const setW = useLayoutState((state) => state.setWorkerAdded);
   useEffect(() => {
-    getQualifications().then((qualifications) => {
-      setQualifications(() => {
-        return (
-          qualifications?.flatMap((item) =>
-            item.qualifications.map((item) => item),
-          ) || []
-        );
-      });      
+    getTaskCategories().then((qualifications) => {
+      setQualifications(qualifications || []);
       setW(false);
       setIsOpen(false);
     });
   }, [workerA, setW]);
-  useEffect(() => {
-    getJobTitles().then((res) => setJobs(res || []));
-  }, []);
   const Validate = async (purpose: "add" | "update") => {
     const res = fields.every((item) => {
       if (!item.validate) return true;
@@ -55,9 +57,9 @@ export default function Page() {
       return;
     } else {
       if (purpose === "add") {
-        const result = await addQualifications({
-          qualificationName: fields[0].value,
-          jobTitleId: fields[1].value || qualifications[0].id,
+        const result = await addTaskCategory({
+          name: fields[0].value,
+          description: fields[1].value,
         });
         if (!result) return;
         setW(true);
@@ -75,49 +77,23 @@ export default function Page() {
             Validate("add");
           }}
         >
-          {fields.map((field) =>
-            field.type === "text" ? (
-              <input
-                key={field.name}
-                className="border-2 rounded-xl outline-none p-2"
-                placeholder={field.placeholder}
-                value={field.value}
-                onChange={(e) => {
-                  setFields((prev) =>
-                    prev.map((item) =>
-                      item.name === field.name
-                        ? { ...item, value: e.target.value }
-                        : item,
-                    ),
-                  );
-                }}
-              ></input>
-            ) : (
-              <select
-                key={field.name}
-                className="border-2 rounded-xl outline-none p-2"
-                value={field.value}
-                onChange={(e) => {
-                  setFields((prev) =>
-                    prev.map((item) =>
-                      item.name === field.name
-                        ? { ...item, value: e.target.value }
-                        : item,
-                    ),
-                  );
-                }}
-              >
-                {jobs.map((item) => {
-                  return (
-                    <option key={item.id} value={item.id}>
-                      {" "}
-                      {item.name}
-                    </option>
-                  );
-                })}
-              </select>
-            ),
-          )}
+          {fields.map((field) => (
+            <input
+              key={field.name}
+              className="border-2 rounded-xl outline-none p-2"
+              placeholder={field.placeholder}
+              value={field.value}
+              onChange={(e) => {
+                setFields((prev) =>
+                  prev.map((item) =>
+                    item.name === field.name
+                      ? { ...item, value: e.target.value }
+                      : item,
+                  ),
+                );
+              }}
+            ></input>
+          ))}
           <input
             type="submit"
             value={"Сохранить"}
@@ -129,9 +105,7 @@ export default function Page() {
         {qualifications[0] ? (
           qualifications.map((qualification) => (
             <ListItem
-              title={
-                qualification?.name
-              }
+              title={qualification?.name}
               key={qualification.id}
               item={qualification}
               deleteItem={deleteQualifications}

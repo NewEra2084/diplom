@@ -6,12 +6,12 @@ import {
 } from "@/shared/api/client";
 import { Project } from "../model/types";
 
-export const getProjects = async () => {
+export const getProjects = async () : Promise<Project[] | null> => {
   const { data, status } = await getTemplate("/project/get");
   if (status >= 400) {
     return null;
   }
-  return data;
+  return data as Project[];
 };
 export const getProjectsWithTasks = async () => {
   const { data, status } = await getTemplate("/project/get/with_tasks");
@@ -20,7 +20,7 @@ export const getProjectsWithTasks = async () => {
   }
   return data;
 };
-export const addProject = async (project: Omit<Project, "id">) => {
+export const addProject = async (project: Omit<Project, "id" | "tasks">) => {
   const { data, status } = await postTemplate(`/project/add`, project);
   if (status >= 400) {
     return null;

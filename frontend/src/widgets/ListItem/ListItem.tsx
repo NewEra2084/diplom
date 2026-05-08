@@ -49,6 +49,7 @@ export const ListItem = ({
           ></Trash2>
         </div>
       </div>
+      
     </div>
   );
 };

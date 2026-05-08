@@ -1,4 +1,9 @@
-import { deleteTemplate, getTemplate, postTemplate, putTemplate } from "@/shared/api/client";
+import {
+  deleteTemplate,
+  getTemplate,
+  postTemplate,
+  putTemplate,
+} from "@/shared/api/client";
 import { Task, TaskReport } from "../model/types";
 
 export const getTasks = async () => {
@@ -8,21 +13,21 @@ export const getTasks = async () => {
   }
   return data;
 };
-export const addTask = async (task: Omit<Task,"id">) => {
+export const addTask = async (task: Omit<Task, "id">) => {
   const { data, status } = await postTemplate("/task/add", task);
   if (status >= 400) {
     return null;
   }
   return data;
 };
-export const updateTask = async (task:Task) => {
+export const updateTask = async (task: Task) => {
   const { data, status } = await putTemplate(`/task/update`, task);
   if (status >= 400) {
     return null;
   }
   return data;
 };
-export const deleteTask = async (taskId:number) => {
+export const deleteTask = async (taskId: string) => {
   const { data, status } = await deleteTemplate(`/task/delete/${taskId}`);
   if (status >= 400) {
     return null;
@@ -30,15 +35,18 @@ export const deleteTask = async (taskId:number) => {
   return data;
 };
 
-export const employeeTakeTask = async (taskId:number) => {
+export const employeeTakeTask = async (taskId: string) => {
   const { data, status } = await postTemplate(`/task/employee/take/${taskId}`);
   if (status >= 400) {
     return null;
   }
   return data;
 };
-export const employeeSendTask = async (task:TaskReport) => {
-  const { data, status } = await postTemplate(`/task/employee/send/report`, task);
+export const employeeSendTask = async (task: TaskReport) => {
+  const { data, status } = await postTemplate(
+    `/task/employee/send/report`,
+    task,
+  );
   if (status >= 400) {
     return null;
   }
@@ -66,12 +74,23 @@ export const managerGetRequests = async () => {
   return data;
 };
 
-
-
 export const getTaskCategories = async () => {
   const { data, status } = await getTemplate("/task/get/task_categories");
   if (status >= 400) {
     return null;
   }
-  return data;
+  return data as { name: string; description: string }[];
+};
+export const addTaskCategory = async (category: {
+  name: string;
+  description: string;
+}) => {
+  const { data, status } = await postTemplate(
+    "/task/add_task_category",
+    category,
+  );
+  if (status >= 400) {
+    return null;
+  }
+  return data as { name: string; description: string }[];
 };

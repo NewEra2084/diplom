@@ -13,9 +13,7 @@ export const fetchUserPoints = async () => {
   return data.points as number;
 };
 export const fetchAllUsers = async () => {
-  const response = await getTemplate("/manager/get/employee");
-  console.log(response);
-  
+  const response = await getTemplate("/manager/get/employee");  
   const data = response.data as  User[] ;  
   return data as User[];
 }
