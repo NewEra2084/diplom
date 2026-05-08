@@ -132,13 +132,18 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional
     public void updateEmployee(UpdateEmployeeRequest request) {
-        Employee employee = employeeRepository.findById(request.getId())
+        Company company = companyDomainService.getCompanyReference();
+
+        Employee employee = employeeRepository
+                .findByIdAndCompany(request.getId(), company)
                 .orElseThrow(() -> new CrmBadRequestException("работник с таким id не найден"));
 
         Qualification qualification = null;
         if (request.getQualificationId() != null) {
-            qualification = qualificationRepository.findById(request.getQualificationId())
+            qualification = qualificationRepository
+                    .findByIdAndJobTitle_company(request.getQualificationId(), company)
                     .orElseThrow(() -> new CrmBadRequestException("квалификация с таким id не найдена"));
         }
 
@@ -150,8 +155,6 @@ public class AdminServiceImpl implements AdminService {
         employee.setFullName(new FullName(request.getFirstName(), request.getLastName(), request.getPatronymic()));
         employee.setQualification(qualification);
         employee.setRoles(Set.of(role));
-
-        employeeRepository.save(employee);
     }
 
     private void validateAddEmployee(AddEmployeeRequest request) {
