@@ -8,11 +8,12 @@ import { useLayoutState } from "@/app/store/useLayoutState";
 type Props = {
   children?: ReactNode;
   title: string;
-  elements: { id: number; name: string; link: string }[];
+  elements?: { id: number; name: string; link: string }[];
+  filters?: { id: number; name: string; link: string, type: string }[];
 };
 
-export const Aside = ({ title, elements }: Props) => {
-  const { asideIsOpen, setAsideIsOpen} = useLayoutState();
+export const Aside = ({ title, elements, filters }: Props) => {
+  const { asideIsOpen, setAsideIsOpen } = useLayoutState();
   const pathname = usePathname();
   const locale = useLocale();
 
@@ -23,15 +24,20 @@ export const Aside = ({ title, elements }: Props) => {
           className={`h-full flex flex-col select-none p-8 rounded-xl border-2 border-secondary dark:border-dark-secondary`}
         >
           <h4 className="text-2xl mb-5">{title}</h4>
-          {elements.map((item) => (
-            <AsideElement
-              key={item.id}
-              to={item.link}
-              className={`${pathname == "/" + locale + "/settings/" + item.link ? "bg-accent dark:bg-dark-secondary hover:bg-none" : "hover:bg-accent/70 dark:hover:bg-dark-secondary/70"}`}
-            >
-              {item.name}
-            </AsideElement>
-          ))}
+          {elements
+            ? elements.map((item) => (
+                <AsideElement
+                  key={item.id}
+                  to={item.link}
+                  className={`${pathname == "/" + locale + "/settings/" + item.link ? "bg-accent dark:bg-dark-secondary hover:bg-none" : "hover:bg-accent/70 dark:hover:bg-dark-secondary/70"}`}
+                >
+                  {item.name}
+                </AsideElement>
+              ))
+            : filters &&
+              filters.map((item) => (
+                <div key={item.id}></div>
+              ))}
         </aside>
       )}
       <div

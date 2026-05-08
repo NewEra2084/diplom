@@ -1,5 +1,5 @@
 "use client";
-import { deleteTemplate, getTemplate, postTemplate } from "@/shared/api/client";
+import { deleteTemplate, getTemplate, postTemplate, putTemplate } from "@/shared/api/client";
 import { User } from "../model/types";
 import { Fields } from "@/widgets/profile/store/profileStore";
 
@@ -14,10 +14,10 @@ export const fetchUserPoints = async () => {
 };
 export const fetchAllUsers = async () => {
   const response = await getTemplate("/manager/get/employee");
-  const data = response.data as { employees: User[] };
-  console.log(data);
+  console.log(response);
   
-  return data.employees as User[];
+  const data = response.data as  User[] ;  
+  return data as User[];
 }
 
 export type FlatData<T> = {
@@ -25,14 +25,15 @@ export type FlatData<T> = {
 };
 export const addWorkerQuery = async (data: Omit<Fields, "jobTitleId">) => {
   const response = await postTemplate("/admin/add/employee", data);
-  if(response.status === 200) {
-    return true;
-  } else {
+  if(response.status > 400) {
     throw new Error("Failed to add worker");
   }
+  return true;
 }
 export const updateWorkerQuery = async (data: Omit<Fields, "password" | "jobTitleId">) => {
-  const response = await postTemplate("/admin/update/employee", data);
+  console.log(data);
+  
+  const response = await putTemplate("/admin/update/employee", data);
   if(response.status === 200) {
     return true;
   } else {

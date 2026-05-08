@@ -136,6 +136,7 @@ export const UserData = ({ className, editable, updateId }: Props) => {
     const result = await addWorkerQuery(worker);
     if (result) {
       setW(true);
+      setIsEdit(false);
     }
   };
   const updateWorker = async (fields: Fields, id: string) => {
@@ -148,24 +149,22 @@ export const UserData = ({ className, editable, updateId }: Props) => {
       login: fields.login,
       patronymic: fields.patronymic,
       qualificationId: fields.qualificationId,
-      role: fields.role,
-    };
+      roleName: fields.role,
+    };    
     const result = await updateWorkerQuery(worker);
     if (result) {
       setW(true);
+      setIsEdit(false);
     }
   };
 
   const Validate = () => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const right = [
-      fields.email.trim() !== "" && emailRegex.test(fields.email),
+      fields.email.trim() !== "",
       fields.login.trim() !== "",
       fields.firstName.trim() !== "",
       fields.lastName.trim() !== "",
       fields.patronymic.trim() !== "",
-      fields.jobTitleId.trim() !== "",
-      fields.qualificationId.trim() !== "",
       fields.role.trim() !== "",
       fields.password &&
         fields.password.trim() !== "" &&
@@ -176,7 +175,7 @@ export const UserData = ({ className, editable, updateId }: Props) => {
 
   return (
     <section
-      className={`${!editable ? "bg-secondary/10 rounded-2xl" : ""} ${className}`}
+      className={`${!editable ? "bg-secondary/10 rounded-2xl w-full" : ""} ${className}`}
     >
       {editable && (
         <h2 className="text-2xl lg:text-3xl text-center mb-5 lg:mb-0 lg:text-left">
@@ -218,8 +217,9 @@ export const UserData = ({ className, editable, updateId }: Props) => {
             <button
               className="w-full p-3 rounded-xl border-2"
               onClick={() => {
+                
                 if (!Validate()) return;
-                if (updateId) {
+                if (updateId != null) {
                   updateWorker(fields, updateId);
                 } else {
                   addWorker(fields);
