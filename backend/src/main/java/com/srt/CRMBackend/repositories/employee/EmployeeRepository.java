@@ -2,6 +2,7 @@ package com.srt.CRMBackend.repositories.employee;
 
 import com.srt.CRMBackend.models.Company;
 import com.srt.CRMBackend.models.employees.Employee;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -47,4 +48,10 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
     boolean existsByIdAndRoles_Name(UUID id, String name);
 
     Optional<Employee> findByIdAndCompany(UUID id, Company company);
+
+    @EntityGraph(attributePaths = {"projects"})
+    Optional<Employee> findWithProjectsByIdAndCompany(UUID id, Company company);
+
+    @EntityGraph(attributePaths = {"projects"})
+    Optional<Employee> findWithProjectsById(UUID id);
 }

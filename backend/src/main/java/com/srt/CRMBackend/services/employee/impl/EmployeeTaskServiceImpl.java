@@ -14,6 +14,7 @@ import com.srt.CRMBackend.repositories.tasks.TaskExecutionRequestRepository;
 import com.srt.CRMBackend.repositories.tasks.TaskRepository;
 import com.srt.CRMBackend.services.company.domain.CompanyDomainService;
 import com.srt.CRMBackend.services.employee.EmployeeTaskService;
+import com.srt.CRMBackend.services.employee.domain.EmployeeDomainService;
 import com.srt.CRMBackend.services.task.domain.TaskDomainService;
 import com.srt.CRMBackend.services.task.domain.TaskReportDomainService;
 import com.srt.CRMBackend.util.AuthHelperUtil;
@@ -37,12 +38,18 @@ public class EmployeeTaskServiceImpl implements EmployeeTaskService {
     private final CompanyDomainService companyDomainService;
     private final TaskDomainService taskDomainService;
     private final TaskReportDomainService taskReportDomainService;
+    private final EmployeeDomainService employeeDomainService;
 
     @Override
     public void takeTask(UUID taskId) {
-        // TODO прикрепление к проекту
-        Task task = taskRepository.findByCompanyAndId(companyDomainService.getCompanyReference(), taskId)
+        Employee employee = employeeDomainService.getByIdWithProjects(authHelperUtil.getEmployee().getId());
+
+        Task task = taskRepository.findWithProjectByCompanyAndId(companyDomainService.getCompanyReference(), taskId)
                 .orElseThrow(() -> new CrmBadRequestException("задача не найдена у данной компании"));
+
+        if (!employee.getProjects().contains(task.getProject())) {
+            throw new CrmBadRequestException("вы не можете взять задачу к которой вы не прекреплены");
+        }
 
         if (task.getStatus() != TaskStatus.FREE) {
             throw new CrmBadRequestException("задача не свободна");

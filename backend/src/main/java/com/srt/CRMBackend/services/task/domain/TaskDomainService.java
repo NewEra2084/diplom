@@ -17,7 +17,7 @@ public class TaskDomainService {
     private final CompanyDomainService companyDomainService;
 
     public Task getByIdAndCurrentCompany(UUID id) {
-        return repository.findByCompanyAndId(companyDomainService.getCompanyReference(), id)
+        return repository.findWithProjectByCompanyAndId(companyDomainService.getCompanyReference(), id)
                 .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор задачи"));
     }
 }

@@ -12,6 +12,8 @@ import java.util.UUID;
 public interface ProjectRepository extends JpaRepository<Project, UUID> {
     boolean existsByNameAndCompany(String name, Company company);
 
+    boolean existsByIdAndCompany(UUID id, Company company);
+
     List<Project> findAllByCompany(Company company);
 
     @EntityGraph(attributePaths = {"tasks", "tasks.taskCategory"})

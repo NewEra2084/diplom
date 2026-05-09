@@ -1,7 +1,9 @@
 package com.srt.CRMBackend.services.company.impl;
 
-import com.srt.CRMBackend.DTO.company.CreateAdminRequest;
+import com.srt.CRMBackend.DTO.RoleEnum;
 import com.srt.CRMBackend.DTO.company.CreateCompanyRequest;
+import com.srt.CRMBackend.DTO.company.GetCompanyResponse;
+import com.srt.CRMBackend.DTO.company.RenewCompanySubscriptionRequest;
 import com.srt.CRMBackend.DTO.company.UpdateCompanyRequest;
 import com.srt.CRMBackend.auth.UserDetailsImpl;
 import com.srt.CRMBackend.exceptions.CrmBadRequestException;
@@ -15,18 +17,17 @@ import com.srt.CRMBackend.repositories.employee.EmployeeRepository;
 import com.srt.CRMBackend.repositories.employee.RoleRepository;
 import com.srt.CRMBackend.services.company.CompanyService;
 import com.srt.CRMBackend.services.company.domain.CompanyDomainService;
+import com.srt.CRMBackend.util.AuthHelperUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +40,7 @@ public class CompanyServiceImpl implements CompanyService {
     private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final AuthHelperUtil authHelperUtil;
 
     @Override
     public void create(CreateCompanyRequest request) {
@@ -75,6 +77,28 @@ public class CompanyServiceImpl implements CompanyService {
         company.setFieldOfEmployment(request.getFieldOfEmployment());
 
         repository.save(company);
+    }
+
+    @Override
+    public void renewSubscription(RenewCompanySubscriptionRequest request) {
+        Employee employee = authHelperUtil.getEmployee();
+        Company company = domainService.getById(employee.getCompany().getId());
+
+        company.setSubscribeFireDate(request.getSubscribeFireDate());
+
+        repository.save(company);
+    }
+
+    @Override
+    public GetCompanyResponse getCompany() {
+        Employee employee = authHelperUtil.getEmployee();
+        Company company = domainService.getById(employee.getCompany().getId());
+
+        var response = mapper.toResponse(company);
+        if (!authHelperUtil.hasRole(RoleEnum.ROLE_ADMIN)) {
+            response.setSubscribeFireDate(null);
+        }
+        return response;
     }
 
     private void validateCreateCompany(CreateCompanyRequest request) {

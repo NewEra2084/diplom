@@ -1,6 +1,7 @@
 package com.srt.CRMBackend.models.employees;
 
 import com.srt.CRMBackend.models.Company;
+import com.srt.CRMBackend.models.tasks.Project;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -58,6 +59,14 @@ public class Employee {
 
     @Column(columnDefinition = "TEXT")
     private String avatarPath;
+
+    @OneToMany
+    @JoinTable(
+            name = "employee_projects",
+            joinColumns = @JoinColumn(name = "employee_id"),
+            inverseJoinColumns = @JoinColumn(name = "project_id")
+    )
+    private Set<Project> projects = new HashSet<>();
 
     public Employee(UUID id) {
         this.id = id;
