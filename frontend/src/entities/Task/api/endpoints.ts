@@ -1,10 +1,13 @@
 import {
   deleteTemplate,
   getTemplate,
+  patchTemplate,
   postTemplate,
   putTemplate,
 } from "@/shared/api/client";
 import { Task, TaskReport } from "../model/types";
+import { User } from "@/entities/User/model/types";
+import { Project } from "@/entities/Project/model/types";
 
 export const getTasks = async () => {
   const { data, status } = await getTemplate("/task/get");
@@ -72,6 +75,55 @@ export const managerGetRequests = async () => {
     return null;
   }
   return data;
+};
+export const getTaskRequests = async () => {
+  const { data, status } = await getTemplate(
+    "/task/requests/get_execution_requests",
+  );
+  if (status >= 400) {
+    return null;
+  }
+  return data as {
+    id: string;
+    status: string;
+    executor: Partial<User>;
+    task: Task;
+  }[];
+};
+export const getTaskReports = async () => {
+  const { data, status } = await getTemplate("/task/report/get");
+  if (status >= 400) {
+    return null;
+  }
+  return data as {
+    id: string;
+    title: string;
+    description: string;
+    status: string;
+    project: Omit<Project, "tasks" | "managerId">;
+    files: string[];
+  }[];
+};
+export const acceptTaskReport = async (reportId: string) => {
+  const { status } = await patchTemplate(`/task/report/accept/${reportId}`);
+  if (status >= 400) {
+    return null;
+  }
+  return true;
+};
+export const acceptTaskRequest = async (requestId: string) => {
+  const { status } = await patchTemplate(`/task/requests/accept_execution_request/${requestId}`);
+  if (status >= 400) {
+    return null;
+  }
+  return true;
+};
+export const rejectTaskReport = async (reportId: string) => {
+  const { status } = await patchTemplate(`/task/report/reject/${reportId}`);
+  if (status >= 400) {
+    return null;
+  }
+  return true;
 };
 
 export const getTaskCategories = async () => {

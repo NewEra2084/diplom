@@ -27,7 +27,7 @@ export const addProject = async (project: Omit<Project, "id" | "tasks">) => {
   }
   return data;
 };
-export const updateProject = async (project: Project) => {
+export const updateProject = async (project: Omit<Project, "tasks">) => {
   const { data, status } = await putTemplate(`/project/update`, project);
   if (status >= 400) {
     return null;

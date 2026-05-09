@@ -163,6 +163,7 @@ export default function Page() {
                     title={project.name + ": " + project.description}
                     key={project.id}
                     item={project}
+                    managers={managers}
                     manager={
                       managers.find((item) => item.id === project.managerId) ||
                       managers[0]

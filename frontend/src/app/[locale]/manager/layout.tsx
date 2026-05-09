@@ -7,7 +7,7 @@ import { ReactNode } from "react";
 
 const elements = [
   { name: "Категории задач", id: 0, link: "categories" },
-  { name: "?", id: 1, link: "" },
+  { name: "Запросы на выполнение", id: 1, link: "requests" },
 ];
 
 export default function Page({ children }: { children: ReactNode }) {

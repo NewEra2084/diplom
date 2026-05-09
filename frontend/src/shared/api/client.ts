@@ -72,6 +72,23 @@ const putTemplate = async (
     throw error;
   }
 };
+const patchTemplate = async (
+  url: string,
+  info = {},
+  contentType = "application/json",
+) => {
+  try {
+    const { data, status } = await api.patch(url, info, {
+      headers: {
+        "Content-Type": contentType
+      },
+    });
+    
+    return { data: data, status: status };
+  } catch (error) {
+    throw error;
+  }
+};
 const postTemplate = async (
   url: string,
   info = {},
@@ -103,4 +120,4 @@ const getTemplate = async <T>(url: string, contentType = "application/json") => 
   }
 };
 
-export { postTemplate, getTemplate, deleteTemplate, putTemplate };
+export { postTemplate, getTemplate, deleteTemplate, putTemplate, patchTemplate };

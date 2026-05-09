@@ -1,5 +1,6 @@
 import { useLayoutState } from "@/app/store/useLayoutState";
-import { getProjects } from "@/entities/Project/api/endpoints";
+import { getProjects, updateProject } from "@/entities/Project/api/endpoints";
+import { Project } from "@/entities/Project/model/types";
 import { addTask, getTaskCategories } from "@/entities/Task/api/endpoints";
 import { User } from "@/entities/User/model/types";
 import { Pencil, PencilOff, Search, Trash2 } from "lucide-react";
@@ -10,6 +11,7 @@ type Props = {
   item: any;
   manager: User;
   title: string;
+  managers: User[];
   editedState: [
     string | null,
     React.Dispatch<React.SetStateAction<string | null>>,
@@ -23,16 +25,27 @@ export const ListAllItem = ({
   deleteItem,
   editedState,
   listState,
+  managers,
   manager,
   children,
   title,
-  setProjects
+  setProjects,
 }: Props) => {
   const [edited, setEdited] = editedState;
   const [addTask4, setAddTask] = useState(false);
+  const [editFields, setEditFields] = useState({
+    name: item.name || "",
+    description: item.description || "",
+    managerId: manager?.id || "",
+  });
+  const [counter, setCounter] = useState(0);
   const [categories, setCategories] = useState<
     { name: string; description: string }[]
   >([]);
+
+  useEffect(() => {
+    setEditFields((prev) => ({ ...prev, managerId: manager?.id }));
+  }, [manager]);
 
   const [fields, setFields] = useState({
     name: "",
@@ -67,44 +80,109 @@ export const ListAllItem = ({
     <div className="w-full flex flex-col justify-between">
       <div
         key={item.id}
-        className="p-2 relative w-full rounded-t-xl border-2 border-secondary flex justify-between items-center"
+        className="p-2 relative w-full rounded-t-xl border-2 border-secondary flex justify-between items-center justify-center"
       >
         {edited !== item.id ? (
           <div className="flex gap-10 items-center">
-            <h4>{title}</h4>
-            <h4>Менеджер: {manager?.firstName + " " + manager?.lastName}</h4>
-            <button
-              className="p-2 border-2 border-secondary rounded-xl"
-              onClick={() => setAddTask((prev) => !prev)}
-            >
-              + Добавить задачу
-            </button>
+            <h4 className={`${manager? "" : "text-center"}`}>{title}</h4>
+            {manager && (
+              <h4>Менеджер: {manager?.firstName + " " + manager?.lastName}</h4>
+            )}
+            {manager && (
+              <button
+                className="p-2 border-2 border-secondary rounded-xl"
+                onClick={() => setAddTask((prev) => !prev)}
+              >
+                + Добавить задачу
+              </button>
+            )}
           </div>
         ) : (
           <div className="flex gap-3">
-            {/* todo: update */}
-            <input></input>
+            <input
+              className="p-2 border-2 rounded-xl border-secondary flex-1"
+              value={editFields.name}
+              placeholder="Название"
+              onChange={(e) =>
+                setEditFields((prev) => ({ ...prev, name: e.target.value }))
+              }
+            ></input>
+            <input
+              className="p-2 border-2 rounded-xl border-secondary flex-1"
+              value={editFields.description}
+              placeholder="Описание"
+              onChange={(e) =>
+                setEditFields((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
+            ></input>
+            <select
+              className="p-2 border-2 rounded-xl border-secondary flex-1"
+              value={editFields.managerId}
+              onChange={(e) =>
+                setEditFields((prev) => ({
+                  ...prev,
+                  manager: e.target.value,
+                }))
+              }
+            >
+              {managers.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.firstName + " " + m.lastName}
+                </option>
+              ))}
+            </select>
+            <button
+              className="p-2 border-2 rounded-xl border-secondary flex-1"
+              onClick={async () => {
+                const response = updateProject({
+                  id: item.id as string,
+                  ...editFields,
+                });
+                if (response != null) {
+                  setEdited(null);
+                  setProjects((prev) => {
+                    return prev.map((project) => {
+                      return project.id === item.id
+                        ? {
+                            ...project,
+                            name: editFields.name,
+                            description: editFields.description,
+                            managerId: editFields.managerId,
+                          }
+                        : project;
+                    });
+                  });
+                }
+              }}
+            >
+              Сохранить
+            </button>
           </div>
         )}
-        <div
-          className={`p-2 ${edited === item.id ? "absolute top-1 right-2" : "block"} rounded-xl border-2 border-secondary flex items-center justify-center gap-2`}
-        >
-          {edited === item.id ? (
-            <PencilOff onClick={() => setEdited(null)} />
-          ) : (
-            <Pencil onClick={() => setEdited(item.id)} />
-          )}
-          <Trash2
-            onClick={async () => {
-              const success = await deleteItem(item.id);
-              if (success) {
-                setItems((prev) =>
-                  prev.filter((item2) => item.id !== item2.id),
-                );
-              }
-            }}
-          ></Trash2>
-        </div>
+        {manager && (
+          <div
+            className={`p-2 ${edited === item.id ? "absolute top-1 right-2" : "block"} rounded-xl border-2 border-secondary flex items-center justify-center gap-2`}
+          >
+            {edited === item.id ? (
+              <PencilOff onClick={() => setEdited(null)} />
+            ) : (
+              <Pencil onClick={() => setEdited(item.id)} />
+            )}
+            <Trash2
+              onClick={async () => {
+                const success = await deleteItem(item.id);
+                if (success) {
+                  setItems((prev) =>
+                    prev.filter((item2) => item.id !== item2.id),
+                  );
+                }
+              }}
+            ></Trash2>
+          </div>
+        )}
       </div>
       {addTask4 && (
         <form

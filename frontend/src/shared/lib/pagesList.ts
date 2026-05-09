@@ -1,4 +1,4 @@
-import { Column } from "./types";
+import { Column } from "@/widgets/header/store/types";
 
 
 export const columns: Column[] = [
@@ -22,7 +22,11 @@ export const columns: Column[] = [
         name: "my projects",
         roles: ["ROLE_EMPLOYEE", "ROLE_MANAGER"],
       },
-      { path: "/AllProjects", name: "all projects", roles: ["ROLE_MANAGER"] },
+      {
+        path: "/AllProjects",
+        name: "all projects",
+        roles: ["ROLE_MANAGER", "ROLE_EMPLOYEE"],
+      },
     ],
     roles: ["ROLE_EMPLOYEE", "ROLE_MANAGER"],
   },

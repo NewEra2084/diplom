@@ -1,13 +1,6 @@
 "use client";
 import { useLayoutState } from "@/app/store/useLayoutState";
-import { getJobTitles } from "@/entities/JobTitle/api/endpoints";
-import { JobTitle } from "@/entities/JobTitle/model/types";
-import {
-  addQualifications,
-  deleteQualifications,
-  getQualifications,
-} from "@/entities/Qualification/api/endpoints";
-import { Qualifications } from "@/entities/Qualification/model/types";
+import { deleteQualifications } from "@/entities/Qualification/api/endpoints";
 import {
   addTaskCategory,
   getTaskCategories,
