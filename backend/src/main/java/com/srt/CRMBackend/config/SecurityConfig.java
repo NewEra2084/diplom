@@ -41,7 +41,7 @@ public class SecurityConfig {
                         .requestMatchers("/project/get/**").authenticated()
                         .requestMatchers("/project/**").hasAnyRole(new String[] {"ADMIN", "MANAGER"})
                         .requestMatchers("/company/create").permitAll()
-                        .requestMatchers("/company/**").hasAnyRole(new String[] {"ADMIN"})
+                        .requestMatchers("/company/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(manager -> manager

@@ -1,17 +1,21 @@
 package com.srt.CRMBackend.services.employee.impl;
 
 import com.srt.CRMBackend.DTO.employee.EmployeeDTO;
+import com.srt.CRMBackend.DTO.employee.UpdateAccountRequest;
 import com.srt.CRMBackend.auth.UserDetailsImpl;
 import com.srt.CRMBackend.exceptions.CrmBadRequestException;
+import com.srt.CRMBackend.mappers.ReportMapper;
 import com.srt.CRMBackend.models.employees.*;
 import com.srt.CRMBackend.repositories.employee.EmployeeRepository;
 import com.srt.CRMBackend.repositories.employee.PointRepository;
 import com.srt.CRMBackend.services.company.domain.CompanyDomainService;
 import com.srt.CRMBackend.services.employee.EmployeeService;
+import com.srt.CRMBackend.util.AuthHelperUtil;
 import com.srt.CRMBackend.util.FileStorageUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -28,6 +32,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final PointRepository pointRepository;
     private final FileStorageUtil fileStorageUtil;
     private final CompanyDomainService companyDomainService;
+
+    private final AuthHelperUtil authHelperUtil;
+    private final ReportMapper reportMapper;
 
     @Override
     public EmployeeDTO getEmployeeData() {
@@ -108,5 +115,21 @@ public class EmployeeServiceImpl implements EmployeeService {
             return Optional.empty();
         }
         return Optional.of(fileStorageUtil.getFile(employee.getAvatarPath()));
+    }
+
+    @Override
+    @Transactional
+    public void updateEmployee(UpdateAccountRequest request) {
+        Employee employee = authHelperUtil.getEmployee();
+
+        FullName fullName = employee.getFullName();
+        fullName.setFirstName(request.getFirstName());
+        fullName.setLastName(request.getLastName());
+        fullName.setPatronymic(request.getPatronymic());
+
+        employee.setEmail(request.getEmail());
+        employee.setLogin(request.getLogin());
+
+        employeeRepository.save(employee);
     }
 }

@@ -1,11 +1,12 @@
 package com.srt.CRMBackend.controllers.employee;
 
 import com.srt.CRMBackend.DTO.employee.EmployeeDTO;
-import com.srt.CRMBackend.exceptions.CrmBadRequestException;
+import com.srt.CRMBackend.DTO.employee.UpdateAccountRequest;
 import com.srt.CRMBackend.services.employee.EmployeeService;
 import com.srt.CRMBackend.util.FileStorageUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -52,5 +53,11 @@ public class EmployeeController {
         return ResponseEntity.ok()
                 .contentType(fileStorageUtil.getContentType(path.get()))
                 .body(resource);
+    }
+
+    @Operation(description = "обновление данных сотрудника")
+    @PutMapping("/update")
+    public void updateEmployee(@RequestBody @Valid UpdateAccountRequest request) {
+        employeeService.updateEmployee(request);
     }
 }
