@@ -15,6 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

@@ -82,9 +82,21 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<ProjectResponse> getAll() {
-        return repository.findAllByCompany(companyDomainService.getCompanyReference()).stream()
-                .map(projectMapper::toResponse)
-                .toList();
+        if (authHelperUtil.hasRole(RoleEnum.ROLE_EMPLOYEE)) {
+            Employee employee = employeeDomainService.getByIdWithProjects(authHelperUtil.getEmployee().getId());
+
+            return repository.findAllByCompany(companyDomainService.getCompanyReference()).stream()
+                    .map(p -> {
+                        var res = projectMapper.toResponse(p);
+                        res.setCanTake(employee.getProjects().contains(p));
+                        return res;
+                    })
+                    .toList();
+        } else {
+            return repository.findAllByCompany(companyDomainService.getCompanyReference()).stream()
+                    .map(projectMapper::toResponse)
+                    .toList();
+        }
     }
 
     @Override

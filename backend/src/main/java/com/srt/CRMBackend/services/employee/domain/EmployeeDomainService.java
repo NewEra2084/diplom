@@ -15,6 +15,16 @@ import java.util.UUID;
 public class EmployeeDomainService {
     private final EmployeeRepository repository;
 
+    public Employee getByIdWithProjects(UUID id) {
+        return repository.findWithProjectsById(id)
+                .orElseThrow(() -> new CrmBadRequestException("such employee not found"));
+    }
+
+    public Employee getByIdAndCompanyWithProjects(UUID id, Company company) {
+        return repository.findWithProjectsByIdAndCompany(id, company)
+                .orElseThrow(() -> new CrmBadRequestException("such employee not found"));
+    }
+
     public Employee getReferenceById(UUID id) {
         return repository.getReferenceById(id);
     }
