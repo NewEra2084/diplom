@@ -28,22 +28,20 @@ public class FileStorageUtilImpl implements FileStorageUtil {
     }
 
     @Override
-    public void uploadFile(MultipartFile multipartFile, String fileName) throws IOException {
-        Path path = Path.of(storageLocation + fileName);
-        multipartFile.transferTo(path);
-    }
+    public String save(MultipartFile multipartFile, String subdirectory) {
+        String filename = multipartFile.getOriginalFilename();
+        assert filename != null;
 
-    @Override
-    public Path getFile(String path) {
-        return Path.of(storageLocation + path);
-    }
+        Path directoryPath = Path.of(storageLocation + subdirectory);
+        Path file = directoryPath.resolve(filename);
+        try {
+            Files.createDirectories(directoryPath);
+            multipartFile.transferTo(file);
+        } catch (IOException e) {
+            throw new IllegalStateException("file transfer error", e);
+        }
 
-    @Override
-    public String getRandomName(MultipartFile file) {
-        String originalFilename = file.getOriginalFilename();
-        assert originalFilename != null;
-        String extension = originalFilename.substring(originalFilename.indexOf('.'));
-        return UUID.randomUUID() + extension;
+        return file.toAbsolutePath().toString();
     }
 
     @Override
@@ -54,7 +52,19 @@ public class FileStorageUtilImpl implements FileStorageUtil {
 
     @Override
     public boolean isImage(MultipartFile file) {
-        return file != null && file.getContentType() != null && file.getContentType().startsWith("image/");
+        String contentType = file.getContentType();
+        System.out.println(contentType);
+        return contentType != null && contentType.startsWith("image/");
+    }
+
+    @Override
+    public void delete(String filepath) {
+        Path path = Path.of(filepath);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new IllegalStateException("file delete error");
+        }
     }
 
     private String determineContentType(Path path) {

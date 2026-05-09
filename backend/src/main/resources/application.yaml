@@ -17,6 +17,12 @@ spring:
     locations: classpath:db/migration
     base-line-on-migrate: true
 
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 30MB
+
+
 server:
   servlet:
     context-path: /api
@@ -37,3 +43,4 @@ admin:
 
 storage:
   location: /home/artem/tmp/uploads/
+  avatar-directory: /avatar

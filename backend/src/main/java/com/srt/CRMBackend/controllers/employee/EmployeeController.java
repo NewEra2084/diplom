@@ -2,6 +2,7 @@ package com.srt.CRMBackend.controllers.employee;
 
 import com.srt.CRMBackend.DTO.employee.EmployeeDTO;
 import com.srt.CRMBackend.DTO.employee.UpdateAccountRequest;
+import com.srt.CRMBackend.DTO.employee.UploadAvatarRequest;
 import com.srt.CRMBackend.services.employee.EmployeeService;
 import com.srt.CRMBackend.util.FileStorageUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,13 +38,13 @@ public class EmployeeController {
         return Map.of("points", employeeService.getCountOfPointers());
     }
 
-    @Operation(description = "добавление/редактирование аватара работника (пока не работает)")
-    @PatchMapping("/avatar/upload")
-    public void uploadAvatar(@ModelAttribute MultipartFile file) {
-        employeeService.uploadAvatar(file);
+    @Operation(description = "добавление/редактирование аватара работника")
+    @PatchMapping(value = "/avatar/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public void uploadAvatar(@ModelAttribute @Valid UploadAvatarRequest request) {
+        employeeService.uploadAvatar(request.getImage());
     }
 
-    @Operation(description = "получение аватара работника по employeeId (пока не работает)")
+    @Operation(description = "получение аватара работника по employeeId")
     @GetMapping("/avatar/{employeeId}")
     public ResponseEntity<Resource> getAvatar(@PathVariable UUID employeeId) {
         Optional<Path> path = employeeService.downloadAvatar(employeeId);

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/company")
-@Tag(name = "компания", description = "все методы доступны админам (кроме create)")
+@Tag(name = "компания", description = "все методы доступны админам (кроме create и get)")
 public class CompanyController {
     private final CompanyService companyService;
 
