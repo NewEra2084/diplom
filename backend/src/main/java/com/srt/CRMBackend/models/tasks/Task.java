@@ -56,6 +56,8 @@ public class Task {
     @JoinColumn(name = "company_id")
     private Company company;
 
+    private String imagePath;
+
     public Task(UUID id) {
         this.id = id;
     }

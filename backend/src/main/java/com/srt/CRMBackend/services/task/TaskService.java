@@ -2,7 +2,9 @@ package com.srt.CRMBackend.services.task;
 
 import com.srt.CRMBackend.DTO.task.*;
 
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface TaskService {
@@ -14,4 +16,6 @@ public interface TaskService {
 
     List<TaskCategoryDTO> getAllTaskCategories();
     List<TaskResponse> getAllTasks();
+
+    Optional<Path> getImagePath(UUID taskId);
 }

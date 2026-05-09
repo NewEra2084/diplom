@@ -24,6 +24,7 @@ CREATE TABLE tasks (
     task_category_id UUID NOT NULL,
     project_id UUID REFERENCES projects(id),
     company_id UUID REFERENCES companies(id),
+    image_path TEXT,
 
     CONSTRAINT fk_task_category FOREIGN KEY (task_category_id) REFERENCES task_categories(id)
 );

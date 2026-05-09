@@ -7,6 +7,7 @@ import com.srt.CRMBackend.services.task.TaskService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -19,8 +20,8 @@ import java.util.UUID;
 public class TaskController {
     private final TaskService taskService;
 
-    @PostMapping("/add")
-    public Map<String, String> addTask(@Valid @RequestBody TaskRequest request) {
+    @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Map<String, String> addTask(@Valid @ModelAttribute TaskRequest request) {
         taskService.addTask(request);
         return Map.of("message", "задача успешно добавлена");
     }

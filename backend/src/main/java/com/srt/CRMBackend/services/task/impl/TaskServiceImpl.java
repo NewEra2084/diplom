@@ -15,11 +15,17 @@ import com.srt.CRMBackend.repositories.tasks.TaskRepository;
 import com.srt.CRMBackend.repositories.tasks.TaskCategoryRepository;
 import com.srt.CRMBackend.services.company.domain.CompanyDomainService;
 import com.srt.CRMBackend.services.task.TaskService;
+import com.srt.CRMBackend.services.task.domain.TaskDomainService;
+import com.srt.CRMBackend.util.FileStorageUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.time.LocalDateTime;
@@ -33,8 +39,14 @@ public class TaskServiceImpl implements TaskService {
     private final ProjectRepository projectRepository;
     private final ProjectMapper projectMapper;
     private final CompanyDomainService companyDomainService;
+    private final FileStorageUtil fileStorageUtil;
+    private final TaskDomainService taskDomainService;
+
+    @Value("${storage.task-directory}")
+    private String taskDirectory;
 
     @Override
+    @Transactional
     public void addTask(TaskRequest request) {
         TaskCategory taskCategory = taskCategoryRepository
                 .findById(request.getTaskCategoryId())
@@ -64,6 +76,15 @@ public class TaskServiceImpl implements TaskService {
                 .company(companyDomainService.getCompanyReference())
                 .build();
         taskRepository.save(task);
+
+        if (request.getImage() != null) {
+            String filepath = fileStorageUtil.save(
+                    request.getImage(),
+                    Path.of(taskDirectory, task.getId().toString()).toString());
+            task.setImagePath(filepath);
+
+            taskRepository.save(task);
+        }
     }
 
     @Override
@@ -99,6 +120,17 @@ public class TaskServiceImpl implements TaskService {
         task.setPublicationTime(LocalDateTime.now());
         task.setTaskCategory(taskCategory);
         task.setProject(project);
+
+        if (task.getImagePath() != null) {
+            fileStorageUtil.delete(task.getImagePath());
+        }
+
+        if (request.getImage() != null) {
+            String filepath = fileStorageUtil.save(
+                    request.getImage(),
+                    Path.of(taskDirectory, task.getId().toString()).toString());
+            task.setImagePath(filepath);
+        }
 
         taskRepository.save(task);
     }
@@ -148,6 +180,17 @@ public class TaskServiceImpl implements TaskService {
                         .project(projectMapper.toGetResponse(t.getProject()))
                         .status(t.getStatus()).build()
                 ).toList();
+    }
+
+    @Override
+    public Optional<Path> getImagePath(UUID taskId) {
+        Task task = taskDomainService.getByIdAndCurrentCompany(taskId);
+
+        if (task.getImagePath() == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(Path.of(task.getImagePath()));
     }
 
     private boolean isPrivateTask(Task t) {

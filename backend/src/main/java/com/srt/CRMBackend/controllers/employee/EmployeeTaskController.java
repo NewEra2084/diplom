@@ -10,8 +10,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.*;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -47,8 +49,8 @@ public class EmployeeTaskController {
     }
 
     @Operation(description = "отправка отчёта")
-    @PostMapping("/send/report")
-    public Map<String, String> sendReport(@RequestBody @Valid SendTaskReportRequest request) {
+    @PostMapping(value = "/send/report", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Map<String, String> sendReport(@ModelAttribute @Valid SendTaskReportRequest request) {
         employeeTaskService.sendReport(request);
         return Map.of("message", "заявка отправлена");
     }

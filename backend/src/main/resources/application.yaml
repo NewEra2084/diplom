@@ -44,3 +44,5 @@ admin:
 storage:
   location: /home/artem/tmp/uploads/
   avatar-directory: /avatar
+  report-directory: /report
+  task-directory: /task

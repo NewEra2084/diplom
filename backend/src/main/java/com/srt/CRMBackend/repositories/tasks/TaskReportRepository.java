@@ -19,6 +19,7 @@ public interface TaskReportRepository extends JpaRepository<TaskReport, UUID> {
     @Query("""
             select tr from TaskReport tr
             join fetch tr.employeeTask et
+            join fetch tr.files
             join fetch et.task t
             join fetch t.project p
             join p.manager m
@@ -30,6 +31,7 @@ public interface TaskReportRepository extends JpaRepository<TaskReport, UUID> {
     @Query("""
             select tr from TaskReport tr
             join fetch tr.employeeTask et
+            join fetch tr.files
             join fetch et.task t
             join fetch t.project p
             join p.manager m
