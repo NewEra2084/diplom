@@ -48,20 +48,21 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional
     public void addTask(TaskRequest request) {
-        TaskCategory taskCategory = taskCategoryRepository
-                .findById(request.getTaskCategoryId())
-                .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор категории задачи"));
+        Company company = companyDomainService.getCompanyReference();
+        TaskCategory taskCategory = null;
 
-        if (!companyDomainService.compareByCurrent(taskCategory.getCompany())) {
-            throw new CrmBadRequestException("идентификатор категории задачи пренадлежит не данной компании");
+        if (request.getTaskCategoryId() != null) {
+            taskCategory = taskCategoryRepository
+                    .findByIdAndCompany(request.getTaskCategoryId(), company)
+                    .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор категории задачи"));
         }
 
-        Project project = projectRepository
-                .findById(request.getProjectId())
-                .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор проекта"));
+        Project project = null;
 
-        if (!companyDomainService.compareByCurrent(project.getCompany())) {
-            throw new CrmBadRequestException("идентификатор проекта пренадлежит не данной компании");
+        if (request.getProjectId() != null) {
+            project = projectRepository
+                    .findByIdAndCompany(request.getProjectId(), company)
+                    .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор проекта"));
         }
 
         Task task = Task.builder()
@@ -97,20 +98,21 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.findById(request.getId())
                 .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор задачи"));
 
-        TaskCategory taskCategory = taskCategoryRepository
-                .findById(request.getTaskCategoryId())
-                .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор категории задачи"));
+        Company company = companyDomainService.getCompanyReference();
+        TaskCategory taskCategory = null;
 
-        if (!companyDomainService.compareByCurrent(taskCategory.getCompany())) {
-            throw new CrmBadRequestException("идентификатор категории задачи пренадлежит не данной компании");
+        if (request.getTaskCategoryId() != null) {
+            taskCategory = taskCategoryRepository
+                    .findByIdAndCompany(request.getTaskCategoryId(), company)
+                    .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор категории задачи"));
         }
 
-        Project project = projectRepository
-                .findById(request.getProjectId())
-                .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор проекта"));
+        Project project = null;
 
-        if (!companyDomainService.compareByCurrent(project.getCompany())) {
-            throw new CrmBadRequestException("идентификатор проекта пренадлежит не данной компании");
+        if (request.getProjectId() != null) {
+            project = projectRepository
+                    .findByIdAndCompany(request.getProjectId(), company)
+                    .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор проекта"));
         }
 
         task.setName(request.getName());
@@ -162,8 +164,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<TaskResponse> getAllTasks() {
-        return taskRepository.findAllWithCategoryAndProjectByCompany(companyDomainService.getCompanyReference())
+    public List<TaskResponse> getAllTasksWithoutProject() {
+        return taskRepository.findWithCategoryAllByCompanyAndProjectNull(companyDomainService.getCompanyReference())
                 .stream()
                 .filter(this::isPrivateTask)
                 .map(t -> TaskResponse.builder()
@@ -172,12 +174,14 @@ public class TaskServiceImpl implements TaskService {
                         .name(t.getName())
                         .deadline(t.getDeadline())
                         .description(t.getDescription())
-                        .category(TaskCategoryDTO.builder()
-                                .id(t.getTaskCategory().getId())
-                                .name(t.getTaskCategory().getName())
-                                .description(t.getTaskCategory().getDescription()).build()
+                        .category(
+                                t.getTaskCategory() != null
+                                        ? TaskCategoryDTO.builder()
+                                          .id(t.getTaskCategory().getId())
+                                          .name(t.getTaskCategory().getName())
+                                          .description(t.getTaskCategory().getDescription()).build()
+                                        : null
                         )
-                        .project(projectMapper.toGetResponse(t.getProject()))
                         .status(t.getStatus()).build()
                 ).toList();
     }

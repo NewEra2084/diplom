@@ -57,7 +57,7 @@ public class EmployeeTaskServiceImpl implements EmployeeTaskService {
         Task task = taskRepository.findWithProjectByCompanyAndId(companyDomainService.getCompanyReference(), taskId)
                 .orElseThrow(() -> new CrmBadRequestException("задача не найдена у данной компании"));
 
-        if (!employee.getProjects().contains(task.getProject())) {
+        if (task.getProject() != null && !employee.getProjects().contains(task.getProject())) {
             throw new CrmBadRequestException("вы не можете взять задачу к которой вы не прекреплены");
         }
 

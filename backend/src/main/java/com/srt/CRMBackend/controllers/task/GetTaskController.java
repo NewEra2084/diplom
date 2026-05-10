@@ -29,10 +29,10 @@ import java.util.UUID;
 public class GetTaskController {
     private final TaskService taskService;
 
-    @Operation(description = "[Deprecated, используй project/get/with_tasks] менеджеры и админы получают все задачи, при этом сотрудники только свободные")
+    @Operation(description = "получение задач без проекта")
     @GetMapping
     public List<TaskResponse> getAllTasks() {
-        return taskService.getAllTasks();
+        return taskService.getAllTasksWithoutProject();
     }
 
     @GetMapping("/task_categories")

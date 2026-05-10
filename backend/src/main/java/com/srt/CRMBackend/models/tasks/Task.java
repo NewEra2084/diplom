@@ -44,7 +44,7 @@ public class Task {
     @Builder.Default
     private TaskStatus status = TaskStatus.FREE;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = true)
     @JoinColumn(name = "task_category_id")
     private TaskCategory taskCategory;
 

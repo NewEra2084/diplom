@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ProjectRepository extends JpaRepository<Project, UUID> {
@@ -15,6 +16,8 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
     boolean existsByIdAndCompany(UUID id, Company company);
 
     List<Project> findAllByCompany(Company company);
+
+    Optional<Project> findByIdAndCompany(UUID id, Company company);
 
     @EntityGraph(attributePaths = {"tasks", "tasks.taskCategory"})
     List<Project> findAllWithTasksAndCategoriesByCompany(Company company);

@@ -21,9 +21,9 @@ CREATE TABLE tasks (
     deadline DATE NOT NULL,
     publication_time TIMESTAMP NOT NULL,
     status VARCHAR(50) NOT NULL,
-    task_category_id UUID NOT NULL,
+    task_category_id UUID,
     project_id UUID REFERENCES projects(id),
-    company_id UUID REFERENCES companies(id),
+    company_id UUID REFERENCES companies(id) NOT NULL,
     image_path TEXT,
 
     CONSTRAINT fk_task_category FOREIGN KEY (task_category_id) REFERENCES task_categories(id)

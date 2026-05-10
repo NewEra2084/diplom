@@ -15,7 +15,7 @@ public interface TaskService {
     void addTaskCategory(TaskCategoryRequest request);
 
     List<TaskCategoryDTO> getAllTaskCategories();
-    List<TaskResponse> getAllTasks();
+    List<TaskResponse> getAllTasksWithoutProject();
 
     Optional<Path> getImagePath(UUID taskId);
 }
