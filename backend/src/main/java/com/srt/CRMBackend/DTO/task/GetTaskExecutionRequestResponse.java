@@ -14,4 +14,5 @@ public class GetTaskExecutionRequestResponse {
     private TaskExecutionRequestStatus status;
     private EmployeeDataResponse executor;
     private TaskDataResponse task;
+    private String comment;
 }

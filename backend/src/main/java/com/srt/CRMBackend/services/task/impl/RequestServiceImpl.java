@@ -1,5 +1,6 @@
 package com.srt.CRMBackend.services.task.impl;
 
+import com.srt.CRMBackend.DTO.request.RejectTaskExecutionRequest;
 import com.srt.CRMBackend.DTO.task.GetTaskExecutionRequestResponse;
 import com.srt.CRMBackend.exceptions.CrmBadRequestException;
 import com.srt.CRMBackend.mappers.TaskExecutionRequestMapper;
@@ -60,6 +61,28 @@ public class RequestServiceImpl implements RequestService {
         }
 
         taskExecutionRequest.setStatus(TaskExecutionRequestStatus.ACCEPTED);
+
+        employeeTaskService.saveEmployeeTask(
+                taskExecutionRequest.getEmployee().getId(),
+                taskExecutionRequest.getTask().getId()
+        );
+    }
+
+    @Override
+    @Transactional
+    public void rejectExecutionRequest(UUID requestId, RejectTaskExecutionRequest request) {
+        TaskExecutionRequest taskExecutionRequest = taskExecutionRequestRepository
+                .findWithTaskAndEmployeeByIdAndTask_company(requestId, companyDomainService.getCompanyReference())
+                .orElseThrow(() -> new CrmBadRequestException("неправильный идентификатор"));
+
+        if (taskExecutionRequest.getTask().getProject() != null &&
+                !taskExecutionRequest.getTask().getProject().getManager().getId()
+                        .equals(authHelperUtil.getEmployee().getId())) {
+            throw new CrmBadRequestException("нету прав для принятия задачи");
+        }
+
+        taskExecutionRequest.setStatus(TaskExecutionRequestStatus.REJECTED);
+        taskExecutionRequest.setComment(request.getComment());
 
         employeeTaskService.saveEmployeeTask(
                 taskExecutionRequest.getEmployee().getId(),

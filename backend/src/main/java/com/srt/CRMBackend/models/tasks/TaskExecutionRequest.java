@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-// запрос на выполнение задачи работником, может быть принят менеджером или админом
 @Entity
 @Table(name = "task_execution_requests")
 @Getter
@@ -27,6 +26,9 @@ public class TaskExecutionRequest {
     @ManyToOne
     @JoinColumn(name = "task_id")
     private Task task;
+
+    @Column(nullable = true)
+    private String comment;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

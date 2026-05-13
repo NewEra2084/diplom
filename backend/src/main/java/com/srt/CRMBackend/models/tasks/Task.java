@@ -44,7 +44,7 @@ public class Task {
     @Builder.Default
     private TaskStatus status = TaskStatus.FREE;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = true)
     @JoinColumn(name = "task_category_id")
     private TaskCategory taskCategory;
 
@@ -55,6 +55,8 @@ public class Task {
     @ManyToOne
     @JoinColumn(name = "company_id")
     private Company company;
+
+    private String imagePath;
 
     public Task(UUID id) {
         this.id = id;

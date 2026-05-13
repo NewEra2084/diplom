@@ -5,6 +5,7 @@ import com.srt.CRMBackend.DTO.task.TaskResponse;
 import com.srt.CRMBackend.DTO.task.report.SendTaskReportRequest;
 import com.srt.CRMBackend.auth.UserDetailsImpl;
 import com.srt.CRMBackend.exceptions.CrmBadRequestException;
+import com.srt.CRMBackend.mappers.ReportMapper;
 import com.srt.CRMBackend.mappers.TaskExecutionRequestMapper;
 import com.srt.CRMBackend.mappers.TaskMapper;
 import com.srt.CRMBackend.models.employees.Employee;
@@ -18,10 +19,15 @@ import com.srt.CRMBackend.services.employee.domain.EmployeeDomainService;
 import com.srt.CRMBackend.services.task.domain.TaskDomainService;
 import com.srt.CRMBackend.services.task.domain.TaskReportDomainService;
 import com.srt.CRMBackend.util.AuthHelperUtil;
+import com.srt.CRMBackend.util.FileStorageUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,8 +43,12 @@ public class EmployeeTaskServiceImpl implements EmployeeTaskService {
     private final AuthHelperUtil authHelperUtil;
     private final CompanyDomainService companyDomainService;
     private final TaskDomainService taskDomainService;
-    private final TaskReportDomainService taskReportDomainService;
     private final EmployeeDomainService employeeDomainService;
+    private final FileStorageUtil fileStorageUtil;
+    private final TaskReportDomainService taskReportDomainService;
+
+    @Value("${storage.report-directory}")
+    private String reportDirectory;
 
     @Override
     public void takeTask(UUID taskId) {
@@ -47,7 +57,7 @@ public class EmployeeTaskServiceImpl implements EmployeeTaskService {
         Task task = taskRepository.findWithProjectByCompanyAndId(companyDomainService.getCompanyReference(), taskId)
                 .orElseThrow(() -> new CrmBadRequestException("задача не найдена у данной компании"));
 
-        if (!employee.getProjects().contains(task.getProject())) {
+        if (task.getProject() != null && !employee.getProjects().contains(task.getProject())) {
             throw new CrmBadRequestException("вы не можете взять задачу к которой вы не прекреплены");
         }
 
@@ -89,6 +99,7 @@ public class EmployeeTaskServiceImpl implements EmployeeTaskService {
     }
 
     @Override
+    @Transactional
     public void sendReport(SendTaskReportRequest request) {
         Task task = taskDomainService.getByIdAndCurrentCompany(request.getTaskId());
         EmployeeTask employeeTask = employeeTaskRepository
@@ -97,7 +108,6 @@ public class EmployeeTaskServiceImpl implements EmployeeTaskService {
 
         employeeTask.setExecutionStatus(ExecutionStatus.SENT_REPORT);
 
-        // TODO files
         TaskReport report = TaskReport.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
@@ -105,5 +115,17 @@ public class EmployeeTaskServiceImpl implements EmployeeTaskService {
                 .build();
 
         taskReportDomainService.save(report);
+
+        report.setFiles(new ArrayList<>());
+        request.getFiles().forEach(file -> {
+           String filename = fileStorageUtil
+                   .save(file, Path.of(reportDirectory, report.getId().toString()).toString());
+
+           report.getFiles().add(TaskReportFile.builder()
+                   .taskReport(report)
+                   .fileName(filename)
+                   .build()
+           );
+        });
     }
 }

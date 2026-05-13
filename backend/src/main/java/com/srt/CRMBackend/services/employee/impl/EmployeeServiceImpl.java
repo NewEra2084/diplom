@@ -13,6 +13,7 @@ import com.srt.CRMBackend.services.employee.EmployeeService;
 import com.srt.CRMBackend.util.AuthHelperUtil;
 import com.srt.CRMBackend.util.FileStorageUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +36,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private final AuthHelperUtil authHelperUtil;
     private final ReportMapper reportMapper;
+
+    @Value("${storage.avatar-directory}")
+    private String avatarDirectory;
 
     @Override
     public EmployeeDTO getEmployeeData() {
@@ -97,13 +101,17 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (!fileStorageUtil.isImage(avatar)) {
             throw new CrmBadRequestException("file format error");
         }
-        String fileName = fileStorageUtil.getRandomName(avatar);
-        try {
-            fileStorageUtil.uploadFile(avatar, fileName);
-        } catch (IOException e) {
-            throw new IllegalStateException("error file uploading: " + e);
+
+        if (userDetails.getEmployee().getAvatarPath() != null) {
+            fileStorageUtil.delete(userDetails.getEmployee().getAvatarPath());
         }
-        userDetails.getEmployee().setAvatarPath(fileName);
+
+        String fileAbsolutePath = fileStorageUtil.save(
+                avatar,
+                Path.of(avatarDirectory, userDetails.getEmployee().getId().toString()).toString()
+        );
+
+        userDetails.getEmployee().setAvatarPath(fileAbsolutePath);
         employeeRepository.save(userDetails.getEmployee());
     }
 
@@ -114,7 +122,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (employee.getAvatarPath() == null) {
             return Optional.empty();
         }
-        return Optional.of(fileStorageUtil.getFile(employee.getAvatarPath()));
+        return Optional.of(Path.of(employee.getAvatarPath()));
     }
 
     @Override

@@ -15,11 +15,17 @@ import com.srt.CRMBackend.repositories.tasks.TaskRepository;
 import com.srt.CRMBackend.repositories.tasks.TaskCategoryRepository;
 import com.srt.CRMBackend.services.company.domain.CompanyDomainService;
 import com.srt.CRMBackend.services.task.TaskService;
+import com.srt.CRMBackend.services.task.domain.TaskDomainService;
+import com.srt.CRMBackend.util.FileStorageUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.time.LocalDateTime;
@@ -33,23 +39,30 @@ public class TaskServiceImpl implements TaskService {
     private final ProjectRepository projectRepository;
     private final ProjectMapper projectMapper;
     private final CompanyDomainService companyDomainService;
+    private final FileStorageUtil fileStorageUtil;
+    private final TaskDomainService taskDomainService;
+
+    @Value("${storage.task-directory}")
+    private String taskDirectory;
 
     @Override
+    @Transactional
     public void addTask(TaskRequest request) {
-        TaskCategory taskCategory = taskCategoryRepository
-                .findById(request.getTaskCategoryId())
-                .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор категории задачи"));
+        Company company = companyDomainService.getCompanyReference();
+        TaskCategory taskCategory = null;
 
-        if (!companyDomainService.compareByCurrent(taskCategory.getCompany())) {
-            throw new CrmBadRequestException("идентификатор категории задачи пренадлежит не данной компании");
+        if (request.getTaskCategoryId() != null) {
+            taskCategory = taskCategoryRepository
+                    .findByIdAndCompany(request.getTaskCategoryId(), company)
+                    .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор категории задачи"));
         }
 
-        Project project = projectRepository
-                .findById(request.getProjectId())
-                .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор проекта"));
+        Project project = null;
 
-        if (!companyDomainService.compareByCurrent(project.getCompany())) {
-            throw new CrmBadRequestException("идентификатор проекта пренадлежит не данной компании");
+        if (request.getProjectId() != null) {
+            project = projectRepository
+                    .findByIdAndCompany(request.getProjectId(), company)
+                    .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор проекта"));
         }
 
         Task task = Task.builder()
@@ -64,6 +77,15 @@ public class TaskServiceImpl implements TaskService {
                 .company(companyDomainService.getCompanyReference())
                 .build();
         taskRepository.save(task);
+
+        if (request.getImage() != null) {
+            String filepath = fileStorageUtil.save(
+                    request.getImage(),
+                    Path.of(taskDirectory, task.getId().toString()).toString());
+            task.setImagePath(filepath);
+
+            taskRepository.save(task);
+        }
     }
 
     @Override
@@ -76,20 +98,21 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.findById(request.getId())
                 .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор задачи"));
 
-        TaskCategory taskCategory = taskCategoryRepository
-                .findById(request.getTaskCategoryId())
-                .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор категории задачи"));
+        Company company = companyDomainService.getCompanyReference();
+        TaskCategory taskCategory = null;
 
-        if (!companyDomainService.compareByCurrent(taskCategory.getCompany())) {
-            throw new CrmBadRequestException("идентификатор категории задачи пренадлежит не данной компании");
+        if (request.getTaskCategoryId() != null) {
+            taskCategory = taskCategoryRepository
+                    .findByIdAndCompany(request.getTaskCategoryId(), company)
+                    .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор категории задачи"));
         }
 
-        Project project = projectRepository
-                .findById(request.getProjectId())
-                .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор проекта"));
+        Project project = null;
 
-        if (!companyDomainService.compareByCurrent(project.getCompany())) {
-            throw new CrmBadRequestException("идентификатор проекта пренадлежит не данной компании");
+        if (request.getProjectId() != null) {
+            project = projectRepository
+                    .findByIdAndCompany(request.getProjectId(), company)
+                    .orElseThrow(() -> new CrmBadRequestException("некорректный идентификатор проекта"));
         }
 
         task.setName(request.getName());
@@ -99,6 +122,17 @@ public class TaskServiceImpl implements TaskService {
         task.setPublicationTime(LocalDateTime.now());
         task.setTaskCategory(taskCategory);
         task.setProject(project);
+
+        if (task.getImagePath() != null) {
+            fileStorageUtil.delete(task.getImagePath());
+        }
+
+        if (request.getImage() != null) {
+            String filepath = fileStorageUtil.save(
+                    request.getImage(),
+                    Path.of(taskDirectory, task.getId().toString()).toString());
+            task.setImagePath(filepath);
+        }
 
         taskRepository.save(task);
     }
@@ -130,8 +164,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<TaskResponse> getAllTasks() {
-        return taskRepository.findAllWithCategoryAndProjectByCompany(companyDomainService.getCompanyReference())
+    public List<TaskResponse> getAllTasksWithoutProject() {
+        return taskRepository.findWithCategoryAllByCompanyAndProjectNull(companyDomainService.getCompanyReference())
                 .stream()
                 .filter(this::isPrivateTask)
                 .map(t -> TaskResponse.builder()
@@ -140,14 +174,27 @@ public class TaskServiceImpl implements TaskService {
                         .name(t.getName())
                         .deadline(t.getDeadline())
                         .description(t.getDescription())
-                        .category(TaskCategoryDTO.builder()
-                                .id(t.getTaskCategory().getId())
-                                .name(t.getTaskCategory().getName())
-                                .description(t.getTaskCategory().getDescription()).build()
+                        .category(
+                                t.getTaskCategory() != null
+                                        ? TaskCategoryDTO.builder()
+                                          .id(t.getTaskCategory().getId())
+                                          .name(t.getTaskCategory().getName())
+                                          .description(t.getTaskCategory().getDescription()).build()
+                                        : null
                         )
-                        .project(projectMapper.toGetResponse(t.getProject()))
                         .status(t.getStatus()).build()
                 ).toList();
+    }
+
+    @Override
+    public Optional<Path> getImagePath(UUID taskId) {
+        Task task = taskDomainService.getByIdAndCurrentCompany(taskId);
+
+        if (task.getImagePath() == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(Path.of(task.getImagePath()));
     }
 
     private boolean isPrivateTask(Task t) {

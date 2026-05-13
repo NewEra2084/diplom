@@ -1,8 +1,11 @@
 package com.srt.CRMBackend.controllers.task;
 
+import com.srt.CRMBackend.DTO.request.RejectTaskExecutionRequest;
 import com.srt.CRMBackend.DTO.task.GetTaskExecutionRequestResponse;
+import com.srt.CRMBackend.models.tasks.TaskExecutionRequest;
 import com.srt.CRMBackend.services.task.RequestService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -24,11 +27,17 @@ public class RequestController {
         return requestService.getExecutionRequests();
     }
 
-    // TODO для менеджера
     @PatchMapping("/accept_execution_request/{requestId}")
     public Map<String, String> acceptExecutionRequest(@PathVariable UUID requestId) {
-        log.info("call - accept execution request");
         requestService.acceptExecutionRequest(requestId);
         return Map.of("message", "запрос на выполнение задачи принят");
+    }
+
+    @PatchMapping("/reject_execution_request/{requestId}")
+    public Map<String, String> rejectExecutionRequest(
+            @PathVariable UUID requestId,
+            @RequestBody @Valid RejectTaskExecutionRequest request) {
+        requestService.rejectExecutionRequest(requestId, request);
+        return Map.of("message", "запрос на выполнение задачи отклонен");
     }
 }
