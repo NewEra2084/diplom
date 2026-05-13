@@ -6,17 +6,16 @@ import { Body } from "@/widgets/body/Body";
 import { ReactNode } from "react";
 
 const elements = [
-  { name: "Категории задач", id: 0, link: "categories" },
-  { name: "Запросы на выполнение", id: 1, link: "requests" },
-  { name: "Запросы на сдачу", id: 2, link: "reports" },
+  { name: "Активные задачи", id: 0, link: "active" },
+  { name: "Неактивные задачи", id: 1, link: "archive" },
 ];
 
 export default function Page({ children }: { children: ReactNode }) {
-  useAuthGuard(["ROLE_MANAGER"]);
+  useAuthGuard(["ROLE_EMPLOYEE"]);
   const { asideIsOpen, viewport } = useLayoutState();
   return (
     <div className="flex h-full lg:gap-3">
-      <Aside title="Менеджер панель" elements={elements} />
+      <Aside title="Задачи" elements={elements} />
       {((viewport < 800 && !asideIsOpen) || viewport >= 800) && (
         <Body>{children}</Body>
       )}

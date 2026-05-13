@@ -5,7 +5,7 @@ import {
   postTemplate,
   putTemplate,
 } from "@/shared/api/client";
-import { Task, TaskReport } from "../model/types";
+import { Category, Task, TaskReport } from "../model/types";
 import { User } from "@/entities/User/model/types";
 import { Project } from "@/entities/Project/model/types";
 
@@ -53,14 +53,23 @@ export const employeeSendTask = async (task: TaskReport) => {
   if (status >= 400) {
     return null;
   }
-  return data;
+  return true;
 };
 export const employeeGetTasks = async () => {
   const { data, status } = await getTemplate(`/task/employee/get_all_tasks`);
   if (status >= 400) {
     return null;
   }
-  return data;
+  return data as {
+    id: string;
+    name: string;
+    description: string;
+    numberOfPoints: number;
+    deadline: string;
+    category: Pick<Category, "id" | "name" | "description">;
+    status: string;
+    project: Pick<Project, "id" | "name" | "description">;
+  }[];
 };
 export const employeeGetRequests = async () => {
   const { data, status } = await getTemplate(`/task/employee/get_all_requests`);
@@ -112,7 +121,9 @@ export const acceptTaskReport = async (reportId: string) => {
   return true;
 };
 export const acceptTaskRequest = async (requestId: string) => {
-  const { status } = await patchTemplate(`/task/requests/accept_execution_request/${requestId}`);
+  const { status } = await patchTemplate(
+    `/task/requests/accept_execution_request/${requestId}`,
+  );
   if (status >= 400) {
     return null;
   }

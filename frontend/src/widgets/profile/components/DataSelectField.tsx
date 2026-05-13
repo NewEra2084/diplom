@@ -37,15 +37,15 @@ export const DataSelectField = ({
             changeField(field, value);
           }}
         >
-          {options?.map((option) => (
+          {options[0]?options?.map((option) => (
             <option key={option.id} value={option.id}>
               {option.name}
             </option>
-          ))}
+          )): <option disabled>Добавьте данные</option>}
         </FormLabelSelect>
       ) : (
         <h5 className="flex-2">
-          {(userData && userData[trueName]) || fields[field]}
+          {(userData && userData[trueName] !=="unknown" ? userData[trueName] : "Нет данных") || (fields[field]!=="unknown"?fields[field]:"")}
         </h5>
       )}
     </div>

@@ -2,7 +2,7 @@
 import { User } from "@/entities/User/model/types";
 
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { HeaderStore } from "../store/HeaderStore";
 import { Column } from "../store/types";
 
@@ -16,6 +16,7 @@ type ProfileProps = {
 
 export const NavListItem = ({ item, userData }: Props) => {
   const t = useTranslations("Header");
+  
   const setIsOpen = HeaderStore((store) => store.setIsOpen);
   return (
     <ul
@@ -43,7 +44,7 @@ dark:lg:text-dark-accent lg:text-main w-fit text-md left-[50%] translate-x-[-50%
   );
 };
 NavListItem.Profile = function Profile({ logout }: ProfileProps) {
-  const t = useTranslations("Header");
+  const t = useTranslations("Header");const router = useRouter();
   const setIsOpen = HeaderStore((store) => store.setIsOpen);
   return (
     <ul
@@ -71,6 +72,7 @@ dark:lg:text-dark-accent lg:text-main w-fit text-md left-[50%] translate-x-[-50%
           href={"/auth"}
           onClick={() => {
             logout();
+            router.push({pathname:"/auth"})
             setIsOpen({ is: false, column: null });
           }}
         >

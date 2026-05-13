@@ -1,8 +1,12 @@
+import { TaskEl } from "@/app/[locale]/AllProjects/components/Task";
 import { useLayoutState } from "@/app/store/useLayoutState";
 import { getProjects, updateProject } from "@/entities/Project/api/endpoints";
 import { Project } from "@/entities/Project/model/types";
 import { addTask, getTaskCategories } from "@/entities/Task/api/endpoints";
+import { Task } from "@/entities/Task/model/types";
+import { fetchAllUsers } from "@/entities/User/api/endpoints";
 import { User } from "@/entities/User/model/types";
+import { postTemplate } from "@/shared/api/client";
 import { Pencil, PencilOff, Search, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -32,16 +36,23 @@ export const ListAllItem = ({
   setProjects,
 }: Props) => {
   const [edited, setEdited] = editedState;
+
+  const [tasks, setTasks] = useState<Task[]>(item.tasks);
   const [addTask4, setAddTask] = useState(false);
+  const [workers, setWorkers] = useState<User[]>([]);
   const [editFields, setEditFields] = useState({
     name: item.name || "",
     description: item.description || "",
     managerId: manager?.id || "",
   });
-  const [counter, setCounter] = useState(0);
   const [categories, setCategories] = useState<
     { name: string; description: string }[]
   >([]);
+  useEffect(() => {
+    fetchAllUsers().then((res) => {
+      setWorkers(res || []);
+    });
+  }, []);
 
   useEffect(() => {
     setEditFields((prev) => ({ ...prev, managerId: manager?.id }));
@@ -80,21 +91,42 @@ export const ListAllItem = ({
     <div className="w-full flex flex-col justify-between">
       <div
         key={item.id}
-        className="p-2 relative w-full rounded-t-xl border-2 border-secondary flex justify-between items-center justify-center"
+        className={`p-2 relative w-full rounded-t-xl border-2 border-secondary flex ${manager ? "justify-between" : "justify-center"} items-center`}
       >
         {edited !== item.id ? (
           <div className="flex gap-10 items-center">
-            <h4 className={`${manager? "" : "text-center"}`}>{title}</h4>
+            <h4 className={`${manager ? "" : "text-center"}`}>{title}</h4>
             {manager && (
               <h4>Менеджер: {manager?.firstName + " " + manager?.lastName}</h4>
             )}
             {manager && (
-              <button
-                className="p-2 border-2 border-secondary rounded-xl"
-                onClick={() => setAddTask((prev) => !prev)}
-              >
-                + Добавить задачу
-              </button>
+              <>
+                <button
+                  className="p-2 border-2 border-secondary rounded-xl"
+                  onClick={() => setAddTask((prev) => !prev)}
+                >
+                  + Добавить задачу
+                </button>
+                <select
+                  onChange={(e) => {
+                    postTemplate("/manager/pin/employee", {
+                      employeeId: e.target.value,
+                      projectId: item.id,
+                    });
+                  }}
+                >
+                  <option disabled>Прикрепить сотрудника</option>
+                  {workers
+                    .filter((worker) =>
+                      worker.rolesName.includes("ROLE_EMPLOYEE"),
+                    )
+                    .map((worker) => (
+                      <option key={worker.id} value={worker.id}>
+                        {worker.firstName + " " + worker.lastName}
+                      </option>
+                    ))}
+                </select>
+              </>
             )}
           </div>
         ) : (
@@ -261,11 +293,18 @@ export const ListAllItem = ({
           />
         </form>
       )}
-      {children && (
-        <div className="p-2 rounded-b-xl border-2 border-t-0 border-secondary flex flex-col gap-3 max-h-[50vh] overflow-y-scroll">
-          {children}
-        </div>
-      )}
+      <div className="p-2 rounded-b-xl border-2 border-t-0 border-secondary flex flex-col gap-3 max-h-[50vh] overflow-y-scroll">
+        {tasks.map((task) => (
+          <TaskEl
+            delet={(id: string) => {
+              setTasks((prev) => prev.filter((prevTask) => prevTask.id !== id));
+            }}
+            project={item}
+            task={task}
+            key={task.id}
+          />
+        ))}
+      </div>
     </div>
   );
 };

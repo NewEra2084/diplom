@@ -18,6 +18,7 @@ export type useUser = {
   user: User | null;
   points: number;
   setUser: () => void;
+  setUserData: (usrData: User) => void;
   getUser: () => User;
   setPoints: () => void;
   getPoints: () => number;

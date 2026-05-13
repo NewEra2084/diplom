@@ -25,11 +25,12 @@ export const addProject = async (project: Omit<Project, "id" | "tasks">) => {
   if (status >= 400) {
     return null;
   }
-  return data;
+  
+  return true;
 };
 export const updateProject = async (project: Omit<Project, "tasks">) => {
   const { data, status } = await putTemplate(`/project/update`, project);
-  if (status >= 400) {
+  if (status >= 400) {    
     return null;
   }
   return data;
@@ -39,5 +40,5 @@ export const deleteProject = async (projectId: string) => {
   if (status >= 400) {
     return null;
   }
-  return data;
+  return true;
 };

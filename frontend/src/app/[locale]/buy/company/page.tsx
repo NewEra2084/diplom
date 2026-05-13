@@ -6,7 +6,7 @@ import { ChangeEvent, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 
 function Page() {
-  const {address, fieldOfEmployment, name} = useBuyStore();
+  const { address, fieldOfEmployment, name } = useBuyStore();
   const setField = useBuyStore((store) => store.setCompanyField);
   const router = useRouter();
   const [error, setError] = useState(false);
@@ -31,30 +31,39 @@ function Page() {
         <h3 className="text-3xl mb-5">Создание компании</h3>
         <div className="flex justify-between">
           <form className="flex flex-col gap-4 w-[40%]">
-            <input
-              className="border-2 border-secondary rounded-lg p-3"
-              placeholder="Адрес"
-              value={address || ""}
-              onChange={(evalue: ChangeEvent<HTMLInputElement>) =>
-                setField(evalue.target.value, "address")
-              }
-            />
-            <input
-              className="border-2 border-secondary rounded-lg p-3"
-              placeholder="Название компании"
-              value={name || ""}
-              onChange={(evalue: ChangeEvent<HTMLInputElement>) =>
-                setField(evalue.target.value, "name")
-              }
-            />
-            <input
-              placeholder="Сфера деятельности"
-              value={fieldOfEmployment|| ""}
-              className="border-2 border-secondary rounded-lg p-3"
-              onChange={(evalue: ChangeEvent<HTMLInputElement>) =>
-                setField(evalue.target.value, "fieldOfEmployment")
-              }
-            />
+            <label className="flex flex-col">
+              <h5>Адрес компании</h5>
+              <input
+                className="border-2 border-secondary rounded-lg p-3"
+                placeholder="г.Москва, ул. Кольцо, д. 120"
+                value={address || ""}
+                onChange={(evalue: ChangeEvent<HTMLInputElement>) =>
+                  setField(evalue.target.value, "address")
+                }
+              />
+            </label>
+            <label className="flex flex-col">
+              <h5>Название компании</h5>
+              <input
+                className="border-2 border-secondary rounded-lg p-3"
+                placeholder="От 8 символов..."
+                value={name || ""}
+                onChange={(evalue: ChangeEvent<HTMLInputElement>) =>
+                  setField(evalue.target.value, "name")
+                }
+              />
+            </label>
+            <label className="flex flex-col">
+              <h5>Сфера деятельности</h5>
+              <input
+                placeholder="Услуги разработки"
+                value={fieldOfEmployment || ""}
+                className="border-2 border-secondary rounded-lg p-3"
+                onChange={(evalue: ChangeEvent<HTMLInputElement>) =>
+                  setField(evalue.target.value, "fieldOfEmployment")
+                }
+              />
+            </label>
             {error && <p>Поля заполнены не верно!</p>}
           </form>
           <p className="text-lg max-w-[40%] mb-10">
@@ -62,9 +71,9 @@ function Page() {
             название (без сокращений, именно оно будет отображаться в
             документах), юридический адрес (по месту регистрации), сферу
             деятельности (например: разработка ПО, логистика, ритейл). Обратите
-            внимание: все поля обязательны. После сохранения данные
-            компании станут основными для всех дальнейших операций, включая
-            создание сотрудников и отчётность.
+            внимание: все поля обязательны. После сохранения данные компании
+            станут основными для всех дальнейших операций, включая создание
+            сотрудников и отчётность.
           </p>
         </div>
       </BuyBody>

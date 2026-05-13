@@ -16,6 +16,7 @@ import { fetchAllUsers } from "@/entities/User/api/endpoints";
 import { User } from "@/entities/User/model/types";
 import { ListAllItem } from "@/widgets/ListAllItem";
 import { TaskEl } from "./components/Task";
+import { Task } from "@/entities/Task/model/types";
 
 export default function Page() {
   useAuthGuard(["ROLE_EMPLOYEE", "ROLE_MANAGER"]);
@@ -40,7 +41,6 @@ export default function Page() {
   ]);
   const [isOpen, setIsOpen] = useState(false);
   const [managers, setManagers] = useState<User[]>([]);
-  const [empty, setEmpty] = useState(false);
   const [edited, setEdited] = useState<string | null>(null);
   const workerA = useLayoutState((state) => state.workerAdded);
   const setW = useLayoutState((state) => state.setWorkerAdded);
@@ -59,6 +59,7 @@ export default function Page() {
       }
     });
   }, []);
+
   const Validate = async (purpose: "add" | "update") => {
     const res = fields.every((item) => {
       if (!item.validate) {
@@ -79,7 +80,9 @@ export default function Page() {
         setW(true);
         setIsOpen(false);
         const prjs = await getProjects();
-        setProjects((prev) => prjs || prev);
+        setProjects((prev) => prjs);
+        console.log(projects);
+        
       }
     }
   };
@@ -92,69 +95,71 @@ export default function Page() {
       {((viewport < 800 && !asideIsOpen) || viewport >= 800) && (
         <Body>
           <div className="w-full h-full flex flex-col relative overflow-y-scroll">
-            <ListPanel isOpen={isOpen} setIsOpen={setIsOpen}>
-              <form
-                className="border-2 rounded-2xl flex flex-col gap-3 p-4"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  Validate("add");
-                }}
-              >
-                {fields.map((field) =>
-                  field.type === "text" ? (
-                    <input
-                      key={field.name}
-                      className="border-2 rounded-xl outline-none p-2"
-                      placeholder={field.placeholder}
-                      value={field.value}
-                      onChange={(e) => {
-                        setFields((prev) =>
-                          prev.map((item) =>
-                            item.name === field.name
-                              ? { ...item, value: e.target.value }
-                              : item,
-                          ),
-                        );
-                      }}
-                    ></input>
-                  ) : (
-                    <select
-                      key={field.name}
-                      className="border-2 rounded-xl outline-none p-2"
-                      value={field.value}
-                      onChange={(e) => {
-                        setFields((prev) =>
-                          prev.map((item) =>
-                            item.name === field.name
-                              ? { ...item, value: e.target.value }
-                              : item,
-                          ),
-                        );
-                      }}
-                    >
-                      {managers.map((item) => {
-                        return (
-                          <option key={item.id} value={item.id}>
-                            {item.firstName +
-                              " " +
-                              item.lastName +
-                              " " +
-                              item.patronymic +
-                              ": " +
-                              item.jobTitleName}
-                          </option>
-                        );
-                      })}
-                    </select>
-                  ),
-                )}
-                <input
-                  type="submit"
-                  value={"Сохранить"}
-                  className="py-2 w-full border-2 bg-secondary rounded-2xl text-main"
-                />
-              </form>
-            </ListPanel>
+            {managers[0] && (
+              <ListPanel isOpen={isOpen} setIsOpen={setIsOpen}>
+                <form
+                  className="border-2 rounded-2xl flex flex-col gap-3 p-4"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    Validate("add");
+                  }}
+                >
+                  {fields.map((field) =>
+                    field.type === "text" ? (
+                      <input
+                        key={field.name}
+                        className="border-2 rounded-xl outline-none p-2"
+                        placeholder={field.placeholder}
+                        value={field.value}
+                        onChange={(e) => {
+                          setFields((prev) =>
+                            prev.map((item) =>
+                              item.name === field.name
+                                ? { ...item, value: e.target.value }
+                                : item,
+                            ),
+                          );
+                        }}
+                      ></input>
+                    ) : (
+                      <select
+                        key={field.name}
+                        className="border-2 rounded-xl outline-none p-2"
+                        value={field.value}
+                        onChange={(e) => {
+                          setFields((prev) =>
+                            prev.map((item) =>
+                              item.name === field.name
+                                ? { ...item, value: e.target.value }
+                                : item,
+                            ),
+                          );
+                        }}
+                      >
+                        {managers.map((item) => {
+                          return (
+                            <option key={item.id} value={item.id}>
+                              {item.firstName +
+                                " " +
+                                item.lastName +
+                                " " +
+                                item.patronymic +
+                                ": " +
+                                item.jobTitleName}
+                            </option>
+                          );
+                        })}
+                      </select>
+                    ),
+                  )}
+                  <input
+                    type="submit"
+                    value={"Сохранить"}
+                    className="py-2 w-full border-2 bg-secondary rounded-2xl text-main"
+                  />
+                </form>
+              </ListPanel>
+            )}
             <div className="w-full flex-1 mt-3 flex flex-col gap-3">
               {projects[0] ? (
                 projects.map((project) => (
@@ -172,18 +177,7 @@ export default function Page() {
                     listState={[projects, setProjects]}
                     editedState={[edited, setEdited]}
                   >
-                    {project.tasks.map((task) => (
-                      <TaskEl
-                        delet={(id: string) => {
-                          getProjects().then((res) => {
-                            setProjects((prev) => res || prev);
-                          });
-                        }}
-                        project={project.id}
-                        task={task}
-                        key={task.id}
-                      />
-                    ))}
+                    
                   </ListAllItem>
                 ))
               ) : (

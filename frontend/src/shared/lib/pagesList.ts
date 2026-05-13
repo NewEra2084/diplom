@@ -1,27 +1,17 @@
 import { Column } from "@/widgets/header/store/types";
 
-
 export const columns: Column[] = [
   {
     title: "tasks",
     pages: [
-      { path: "/MyTasks", name: "my tasks", roles: ["ROLE_EMPLOYEE"] },
-      {
-        path: "/AllTasks",
-        name: "all tasks",
-        roles: ["ROLE_EMPLOYEE", "ROLE_MANAGER"],
-      },
+      { path: "/tasks/active", name: "active", roles: ["ROLE_EMPLOYEE"] },
+      { path: "/tasks/archive", name: "archive", roles: ["ROLE_EMPLOYEE"] },
     ],
-    roles: ["ROLE_EMPLOYEE", "ROLE_MANAGER"],
+    roles: ["ROLE_EMPLOYEE"],
   },
   {
     title: "projects",
     pages: [
-      {
-        path: "/MyProjects",
-        name: "my projects",
-        roles: ["ROLE_EMPLOYEE", "ROLE_MANAGER"],
-      },
       {
         path: "/AllProjects",
         name: "all projects",

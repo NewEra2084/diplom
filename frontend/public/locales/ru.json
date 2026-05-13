@@ -5,7 +5,8 @@
     "panel": "Панель управления",
     "tasks": "Задачи",
     "projects":"Проекты",
-    "my tasks":"Мои задачи",
+    "active":"Активные задачи",
+    "archive":"Неактивные задачи",
     "all tasks":"Все задачи",
     "all projects":"Все проекты",
     "my projects":"Мои проекты",
@@ -22,5 +23,12 @@
       "en":"Английский",
       "ru":"Русский"
     }
+  },
+  "CompanyData":{
+    "name":"Название",
+    "description":"Описание",
+    "address":"Адрес",
+    "fieldOfEmployment":"Сфера деятельности",
+    "subscribeFireDate":"Дата окончания подписки"
   }
 }

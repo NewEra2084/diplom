@@ -20,7 +20,7 @@ export const FormLabelInput = ({
   const [inputState, setInputState] = useState(value);
   const id = useId();
   return (
-    <div className={`${className} relative w-full`}>
+    <div className={`${className} relative w-full h-fit`}>
       <input
         id={id}
         type={type === "text" ? "text" : visible ? "text" : "password"}

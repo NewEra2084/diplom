@@ -13,8 +13,8 @@ import { useEffect, useState } from "react";
 export default function Page() {
   const [jobs, setJobs] = useState<JobTitle[]>([]);
   const [fields, setFields] = useState([
-    { name: "name", placeholder: "Название", value: "", validate: 3 },
-    { name: "description", placeholder: "Описание", value: "", validate: 10 },
+    { name: "name", placeholder: "Название", placeholder2: "От 3 символов", value: "", validate: 3 },
+    { name: "description", placeholder: "Описание",placeholder2: "От 10 символов", value: "", validate: 10 },
   ]);
   const [isOpen, setIsOpen] = useState(false);
   const [edited, setEdited] = useState<string | null>(null);
@@ -53,21 +53,23 @@ export default function Page() {
           }}
         >
           {fields.map((field) => (
-            <input
-              key={field.name}
-              className="border-2 rounded-xl outline-none p-2"
-              placeholder={field.placeholder}
-              value={field.value}
-              onChange={(e) => {
-                setFields((prev) =>
-                  prev.map((item) =>
-                    item.name === field.name
-                      ? { ...item, value: e.target.value }
-                      : item,
-                  ),
-                );
-              }}
-            ></input>
+            <label key={field.name} className="flex flex-col">
+              <h5>{field.placeholder}</h5>
+              <input
+                className="border-2 rounded-xl outline-none p-2"
+                placeholder={field.placeholder2}
+                value={field.value}
+                onChange={(e) => {
+                  setFields((prev) =>
+                    prev.map((item) =>
+                      item.name === field.name
+                        ? { ...item, value: e.target.value }
+                        : item,
+                    ),
+                  );
+                }}
+              ></input>
+            </label>
           ))}
           <input
             type="submit"
@@ -80,6 +82,7 @@ export default function Page() {
         {jobs[0] ? (
           jobs.map((job) => (
             <ListItem
+            staticItem
               title={job.name + ": " + job.description}
               key={job.id}
               item={job}

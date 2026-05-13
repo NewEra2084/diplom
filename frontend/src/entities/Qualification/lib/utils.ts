@@ -3,6 +3,8 @@ import { getQualifications } from "../api/endpoints";
 
 export const getSpreadQualifications = async (jobTitleId: string) => {
   const data = await getQualifications();
+  console.log(data);
+  
   if (!data) return;
   const needed = data.find((item) => item.id === jobTitleId);
   if (needed) {

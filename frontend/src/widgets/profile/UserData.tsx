@@ -16,6 +16,7 @@ import { role } from "@/entities/User/model/types";
 import {
   addWorkerQuery,
   FlatData,
+  updateEmployee,
   updateWorkerQuery,
 } from "@/entities/User/api/endpoints";
 import { useLayoutState } from "@/app/store/useLayoutState";
@@ -66,7 +67,9 @@ export const UserData = ({ className, editable, updateId }: Props) => {
   );
   const [jobTitles, setJobTitles] = useState<jobTitlesOption[]>([]);
   const userData = UserStore((state) => state.user);
+  const setUserData = UserStore((state) => state.setUserData);
   const roleName = userRoleByName();
+  
 
   useEffect(() => {
     if (!editable) {
@@ -105,7 +108,7 @@ export const UserData = ({ className, editable, updateId }: Props) => {
   useEffect(() => {
     (async () => {
       const res = await getSpreadQualifications(fields.jobTitleId);
-
+      
       if (res) {
         setQualifications(res);
       }
@@ -150,7 +153,7 @@ export const UserData = ({ className, editable, updateId }: Props) => {
       patronymic: fields.patronymic,
       qualificationId: fields.qualificationId,
       roleName: fields.role,
-    };    
+    };
     const result = await updateWorkerQuery(worker);
     if (result) {
       setW(true);
@@ -172,6 +175,36 @@ export const UserData = ({ className, editable, updateId }: Props) => {
     ].every(Boolean);
     return right;
   };
+  const ValidateEmp = async () => {
+    const right = [
+      fields.email.trim() !== "",
+      fields.login.trim() !== "",
+      fields.firstName.trim() !== "",
+      fields.lastName.trim() !== "",
+      fields.patronymic.trim() !== "",
+    ].every(Boolean);
+    if (right) {
+      const res = await updateEmployee({
+        email: fields.email,
+        firstName: fields.firstName,
+        lastName: fields.lastName,
+        patronymic: fields.patronymic,
+        login: fields.login,
+      });
+      if (res == true) {
+        if (!userData) return;
+        setUserData({
+          ...userData,
+          firstName: fields.firstName,
+          email: fields.email,
+          lastName: fields.lastName,
+          patronymic: fields.patronymic,
+          login: fields.login,
+        });
+        setIsEdit(false);
+      }
+    }
+  };
 
   return (
     <section
@@ -192,7 +225,7 @@ export const UserData = ({ className, editable, updateId }: Props) => {
           <DataField purpose="Имя" field="firstName" />
           <DataField purpose="Фамилия" field="lastName" />
           <DataField purpose="Отчество" field="patronymic" />
-          <DataField purpose="Пароль" field="password" />
+          {!editable && <DataField type="password" purpose="Пароль" field="password" />}
           <DataSelectField
             available={isUserApproved("ROLE_ADMIN")}
             options={jobTitles}
@@ -217,7 +250,6 @@ export const UserData = ({ className, editable, updateId }: Props) => {
             <button
               className="w-full p-3 rounded-xl border-2"
               onClick={() => {
-                
                 if (!Validate()) return;
                 if (updateId != null) {
                   updateWorker(fields, updateId);
@@ -232,12 +264,11 @@ export const UserData = ({ className, editable, updateId }: Props) => {
           {editable && (
             <div className="absolute top-0 right-5">
               {isEdit ? (
-                <PencilOff onClick={() => setIsEdit(false)} />
+                <PencilOff onClick={() => ValidateEmp()} />
               ) : (
                 <SquarePen
                   onClick={() => {
                     setIsEdit(true);
-                    Validate();
                   }}
                 />
               )}

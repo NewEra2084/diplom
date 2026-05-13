@@ -21,13 +21,12 @@ export default function Page() {
         setRequests(result);
       }
     })();
-  }, []);
-  console.log(requests);
+  }, []);  
   
   return (
     <div>
-      {requests.map((request) => (
-        <TaskEl editable={false} task={request.task}></TaskEl>
+      {requests.filter(request=>request.status!=="ACCEPTED").map((request) => (
+        <TaskEl key={request.id} variant="managerPanel" request={request} editable={false} task={request.task}></TaskEl>
       ))}
     </div>
   );

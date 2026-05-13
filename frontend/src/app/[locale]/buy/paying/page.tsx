@@ -18,11 +18,31 @@ const formatCardNumber = (value: string): string => {
 
   // Ограничиваем 16 символами
   const truncated = numbers.slice(0, 16);
+  console.log("wef");
 
   // Группируем по 4 символа
   const groups = truncated.match(/.{1,4}/g);
 
   return groups ? groups.join(" ") : truncated;
+};
+const formatCardDate = (value: string): string => {
+  const numbers = value.replace(/\D/g, "");
+  let date: number | string = numbers.slice(0, 2); // первые 4 цифры
+  let month: number | string = numbers.slice(2, 4); // первые 4 цифры
+  let year: number | string = numbers.slice(4, 8); // следующие 4 цифры
+  if(parseInt(date) > 31){
+    date = 31
+  }
+  if(parseInt(month) > 12){
+    month = 12
+  }
+  if(parseInt(year) > 2030){
+    year = 2030
+  }else if(year.length === 4 && parseInt(year) < 2026){
+    year = 2026
+  }
+  // Добавляем вторую часть без разделения
+  return month ? `${date} ${month} ${year}` : date.toString();
 };
 
 function Page() {
@@ -45,6 +65,18 @@ function Page() {
     if (numbers.length <= 16) {
       const formatted = formatCardNumber(numbers);
       setField((prev) => ({ ...prev, number: formatted }));
+    }
+  };
+  const handleCardDateChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value;
+
+    // Удаляем пробелы, оставляем только цифры
+    const numbers = rawValue.replace(/\D/g, "");
+
+    // Ограничиваем 8 цифрами
+    if (numbers.length <= 8) {
+      const formatted = formatCardDate(numbers);
+      setField((prev) => ({ ...prev, date: formatted }));
     }
   };
 
@@ -70,7 +102,6 @@ function Page() {
       (fields.cvv && fields.cvv.length < 3)
     ) {
       setError(true);
-      console.log("b");
       return;
     }
     setError(false);
@@ -95,35 +126,41 @@ function Page() {
         <h3 className="text-3xl mb-5">Оплата</h3>
         <div className="flex justify-between">
           <form className="flex flex-col gap-4 w-[40%]">
-            <input
-              className="border-2 border-secondary rounded-lg p-3"
-              placeholder="Номер"
-              value={fields.number || ""}
-              onChange={(evalue: ChangeEvent<HTMLInputElement>) =>
-                handleCardNumberChange(evalue)
-              }
-            />
-            <input
-              className="border-2 border-secondary rounded-lg p-3"
-              placeholder="Дата окончания"
-              value={fields.date || ""}
-              onChange={(evalue: ChangeEvent<HTMLInputElement>) => {
-                const value = evalue.target.value;
-                if (value.length <= 8) {
-                  setField((prev) => ({ ...prev, date: value }));
+            <label className="flex flex-col">
+              <h5>Номер карты</h5>
+              <input
+                className="border-2 border-secondary rounded-lg p-3"
+                placeholder="1234 1234 1234 1234"
+                value={fields.number || ""}
+                onChange={(evalue: ChangeEvent<HTMLInputElement>) =>
+                  handleCardNumberChange(evalue)
                 }
-              }}
-            />
-            <input
-              placeholder="CVV"
-              value={fields.cvv || ""}
-              className="border-2 border-secondary rounded-lg p-3"
-              onChange={(evalue: ChangeEvent<HTMLInputElement>) => {
-                const value = evalue.target.value;
-                value.length <= 3 &&
-                  setField((prev) => ({ ...prev, cvv: value }));
-              }}
-            />
+              />
+            </label>
+            <label className="flex flex-col">
+              <h5>Дата окончания действия карты</h5>
+              <input
+                className="border-2 border-secondary rounded-lg p-3"
+                placeholder="Дата окончания"
+                value={fields.date || ""}
+                onChange={(evalue: ChangeEvent<HTMLInputElement>) => {
+                  handleCardDateChange(evalue);
+                }}
+              />
+            </label>
+            <label className="flex flex-col">
+              <h5>CVV карты</h5>
+              <input
+                placeholder="CVV"
+                value={fields.cvv || ""}
+                className="border-2 border-secondary rounded-lg p-3"
+                onChange={(evalue: ChangeEvent<HTMLInputElement>) => {
+                  const value = evalue.target.value;
+                  value.length <= 3 &&
+                    setField((prev) => ({ ...prev, cvv: value }));
+                }}
+              />
+            </label>
             {error && <p>Поля заполнены не верно!</p>}
           </form>
           <p className="text-lg max-w-[40%] mb-10">

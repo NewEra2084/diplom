@@ -1,5 +1,5 @@
 import { Company } from "@/app/[locale]/buy/types";
-import { postTemplate } from "@/shared/api/client";
+import { getTemplate, postTemplate, putTemplate } from "@/shared/api/client";
 
 export const createCompany = async (companyData: Company) => {
   const response = await postTemplate("/company/create", companyData);
@@ -10,8 +10,16 @@ export const createCompany = async (companyData: Company) => {
   }
   return false;
 };
+export const getCompany = async () => {
+  const response = await getTemplate("/company/get");
+  if (response.status >= 400) {
+    throw new Error()
+  } else {
+    return response.data;
+  }
+};
 export const updateCompany = (
   companyData: Omit<Company, "admin" | "subscribeFireDate">,
 ) => {
-  postTemplate("/company/update", companyData);
+  putTemplate("/company/update", companyData);
 };
