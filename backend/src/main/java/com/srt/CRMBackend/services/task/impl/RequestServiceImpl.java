@@ -5,9 +5,12 @@ import com.srt.CRMBackend.DTO.task.GetTaskExecutionRequestResponse;
 import com.srt.CRMBackend.exceptions.CrmBadRequestException;
 import com.srt.CRMBackend.mappers.TaskExecutionRequestMapper;
 import com.srt.CRMBackend.models.employees.Employee;
+import com.srt.CRMBackend.models.tasks.Task;
 import com.srt.CRMBackend.models.tasks.TaskExecutionRequest;
 import com.srt.CRMBackend.models.tasks.TaskExecutionRequestStatus;
+import com.srt.CRMBackend.models.tasks.TaskStatus;
 import com.srt.CRMBackend.repositories.tasks.TaskExecutionRequestRepository;
+import com.srt.CRMBackend.repositories.tasks.TaskRepository;
 import com.srt.CRMBackend.services.company.domain.CompanyDomainService;
 import com.srt.CRMBackend.services.employee.EmployeeTaskService;
 import com.srt.CRMBackend.services.employee.domain.EmployeeDomainService;
@@ -31,6 +34,7 @@ public class RequestServiceImpl implements RequestService {
     private final AuthHelperUtil authHelperUtil;
     private final TaskExecutionRequestMapper taskExecutionRequestMapper;
     private final EmployeeDomainService employeeDomainService;
+    private final TaskRepository taskRepository;
 
     @Override
     public List<GetTaskExecutionRequestResponse> getExecutionRequests() {
@@ -84,9 +88,8 @@ public class RequestServiceImpl implements RequestService {
         taskExecutionRequest.setStatus(TaskExecutionRequestStatus.REJECTED);
         taskExecutionRequest.setComment(request.getComment());
 
-        employeeTaskService.saveEmployeeTask(
-                taskExecutionRequest.getEmployee().getId(),
-                taskExecutionRequest.getTask().getId()
-        );
+        Task task = taskExecutionRequest.getTask();
+        task.setStatus(TaskStatus.FREE);
+        taskRepository.save(task);
     }
 }
