@@ -18,6 +18,7 @@ export default function Page() {
       project: Pick<Project, "id" | "name" | "description">;
     }[]
   >([]);
+  console.log(requests);
   useEffect(() => {
     (async () => {
       const result = await employeeGetTasks();

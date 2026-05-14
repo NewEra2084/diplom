@@ -8,6 +8,7 @@ import { ReactNode } from "react";
 const elements = [
   { name: "Активные задачи", id: 0, link: "active" },
   { name: "Неактивные задачи", id: 1, link: "archive" },
+  { name: "Запросы на выполнение", id: 2, link: "requests" },
 ];
 
 export default function Page({ children }: { children: ReactNode }) {

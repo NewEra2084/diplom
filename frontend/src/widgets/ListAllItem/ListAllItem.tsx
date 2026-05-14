@@ -7,6 +7,7 @@ import { Task } from "@/entities/Task/model/types";
 import { fetchAllUsers } from "@/entities/User/api/endpoints";
 import { User } from "@/entities/User/model/types";
 import { postTemplate } from "@/shared/api/client";
+import { CustomCheckbox } from "@/shared/ui/UICheckbox";
 import { Pencil, PencilOff, Search, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -39,6 +40,8 @@ export const ListAllItem = ({
 
   const [tasks, setTasks] = useState<Task[]>(item.tasks);
   const [addTask4, setAddTask] = useState(false);
+  const [pinWorker, setPinWorker] = useState(false);
+  const [pinWorkerQuery, setPinWorkerQuery] = useState([]);
   const [workers, setWorkers] = useState<User[]>([]);
   const [editFields, setEditFields] = useState({
     name: item.name || "",
@@ -107,6 +110,7 @@ export const ListAllItem = ({
                 >
                   + Добавить задачу
                 </button>
+                
                 <select
                   onChange={(e) => {
                     postTemplate("/manager/pin/employee", {
@@ -131,25 +135,31 @@ export const ListAllItem = ({
           </div>
         ) : (
           <div className="flex gap-3">
-            <input
-              className="p-2 border-2 rounded-xl border-secondary flex-1"
-              value={editFields.name}
-              placeholder="Название"
-              onChange={(e) =>
-                setEditFields((prev) => ({ ...prev, name: e.target.value }))
-              }
-            ></input>
-            <input
-              className="p-2 border-2 rounded-xl border-secondary flex-1"
-              value={editFields.description}
-              placeholder="Описание"
-              onChange={(e) =>
-                setEditFields((prev) => ({
-                  ...prev,
-                  description: e.target.value,
-                }))
-              }
-            ></input>
+            <label className="flex flex-col">
+              <h5>Название</h5>
+              <input
+                className="p-2 border-2 rounded-xl border-secondary flex-1"
+                value={editFields.name}
+                placeholder="От 3 символов"
+                onChange={(e) =>
+                  setEditFields((prev) => ({ ...prev, name: e.target.value }))
+                }
+              ></input>
+            </label>
+            <label className="flex flex-col">
+              <h5>Описание</h5>
+              <input
+                className="p-2 border-2 rounded-xl border-secondary flex-1"
+                value={editFields.description}
+                placeholder="От 10 символов"
+                onChange={(e) =>
+                  setEditFields((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
+              ></input>
+            </label>
             <select
               className="p-2 border-2 rounded-xl border-secondary flex-1"
               value={editFields.managerId}

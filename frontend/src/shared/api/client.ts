@@ -123,6 +123,23 @@ const postTemplate = async (
     throw error;
   }
 };
+const postMultyPartTemplate = async (
+  url: string,
+  info: FormData,
+  contentType = "multipart/form-data",
+) => {
+  try {
+    const { data, status } = await api.post(url, info, {
+      headers: {
+        "Content-Type": contentType,
+      },
+    });
+
+    return { data: data, status: status };
+  } catch (error) {
+    throw error;
+  }
+};
 
 const getTemplate = async <T>(
   url: string,
@@ -146,4 +163,5 @@ export {
   deleteTemplate,
   putTemplate,
   patchTemplate,
+  postMultyPartTemplate
 };

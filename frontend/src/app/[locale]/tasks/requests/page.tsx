@@ -1,42 +1,43 @@
 "use client";
-import { getTaskRequests } from "@/entities/Task/api/endpoints";
-import { Task } from "@/entities/Task/model/types";
-import { User } from "@/entities/User/model/types";
+import { Project } from "@/entities/Project/model/types";
+import {
+  employeeGetRequests,
+  employeeGetTasks,
+} from "@/entities/Task/api/endpoints";
+import { Category, Task } from "@/entities/Task/model/types";
 import { useEffect, useState } from "react";
 import { TaskEl } from "../../AllProjects/components/Task";
+import { User } from "@/entities/User/model/types";
 
 export default function Page() {
   const [requests, setRequests] = useState<
     {
       id: string;
       status: string;
-      executor: Partial<User>;
+      executor: User;
       task: Task;
+      comment: string;
     }[]
   >([]);
+  
+  
   useEffect(() => {
     (async () => {
-      const result = await getTaskRequests();
+      const result = await employeeGetRequests();
       if (result !== null) {
         setRequests(result);
       }
     })();
   }, []);
-  console.log(requests);
-  
-
   return (
-    <div>
+    <div className="space-y-4">
       {requests
-        .filter((request) => request.status !== "ACCEPTED" && request.status !== "REJECTED")
         .map((request) => (
           <TaskEl
             key={request.id}
-            variant="managerPanel"
+            variant="requests"
             request={request}
             editable={false}
-            set={setRequests}
-            task={request.task}
           ></TaskEl>
         ))}
     </div>

@@ -2,6 +2,7 @@ import {
   deleteTemplate,
   getTemplate,
   patchTemplate,
+  postMultyPartTemplate,
   postTemplate,
   putTemplate,
 } from "@/shared/api/client";
@@ -45,8 +46,8 @@ export const employeeTakeTask = async (taskId: string) => {
   }
   return data;
 };
-export const employeeSendTask = async (task: TaskReport) => {
-  const { data, status } = await postTemplate(
+export const employeeSendTask = async (task: FormData) => {
+  const { data, status } = await postMultyPartTemplate(
     `/task/employee/send/report`,
     task,
   );
@@ -76,7 +77,13 @@ export const employeeGetRequests = async () => {
   if (status >= 400) {
     return null;
   }
-  return data;
+  return data as {
+    id: string;
+    status: string;
+    executor: User;
+    task: Task;
+    comment: string;
+  }[];
 };
 export const managerGetRequests = async () => {
   const { data, status } = await getTemplate(`/task/report/get`);
@@ -123,6 +130,16 @@ export const acceptTaskReport = async (reportId: string) => {
 export const acceptTaskRequest = async (requestId: string) => {
   const { status } = await patchTemplate(
     `/task/requests/accept_execution_request/${requestId}`,
+  );
+  if (status >= 400) {
+    return null;
+  }
+  return true;
+};
+export const rejectTaskRequest = async (requestId: string, comm: string) => {
+  const { status } = await patchTemplate(
+    `/task/requests/reject_execution_request/${requestId}`,
+    { comment: comm },
   );
   if (status >= 400) {
     return null;

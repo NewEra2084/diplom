@@ -22,13 +22,11 @@ export default function Page() {
         setReports(result);
       }
     })();
-  }, []);
-  console.log(reports);
-  
+  }, []); 
 
   return (
     <div>
-      {reports.map((request) => (
+      {reports.filter((request) => request.status === "NEW").map((request) => (
         <TaskEl
           key={request.id}
           variant="reports"

@@ -5,19 +5,22 @@ import {
   deleteTask,
   employeeSendTask,
   employeeTakeTask,
+  rejectTaskReport,
+  rejectTaskRequest,
   updateTask,
 } from "@/entities/Task/api/endpoints";
 import { Task, TaskInProject } from "@/entities/Task/model/types";
 import { UserStore } from "@/entities/User/model/store";
 import { User } from "@/entities/User/model/types";
-import { useState } from "react";
+import { DialogComponent } from "@/shared/ui/Dialog";
+import { useRef, useState } from "react";
 
 type Props = {
   task?: TaskInProject;
   project?: Project;
   delet?: (id: string) => void;
   editable?: boolean;
-  variant?: "managerPanel" | "projects" | "workerTask" | "reports";
+  variant?: "managerPanel" | "projects" | "workerTask" | "reports" | "requests";
   request: {
     id: string;
     executor: Partial<User>;
@@ -29,11 +32,21 @@ export const TaskEl = ({
   task,
   project,
   delet,
+  set,
   editable = true,
   variant = "projects",
   request,
 }: Props) => {
   const [isEdit, setIsEdit] = useState(false);
+  const [comm, setComm] = useState("");
+  const [files, setFiles] = useState<File[]>([]);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const openDialog = () => {
+    dialogRef.current?.showModal();
+  };
+  const closeDialog = () => {
+    dialogRef.current?.close();
+  };
   const [fields, setFields] = useState<Task>({
     id: task?.id || "",
     name: task?.name || "",
@@ -48,63 +61,73 @@ export const TaskEl = ({
     return (
       <div className="p-2 border-2 border-secondary rounded-xl">
         {isEdit ? (
-          <input
-            className="py-1 px-2 border-2 rounded-xl border-secondary flex-1"
-            value={fields.name}
-            placeholder="Название"
-            onChange={(e) =>
-              setFields((prev) => ({ ...prev, name: e.target.value }))
-            }
-          ></input>
+          <label className="flex flex-col">
+            <h5>Название</h5>
+            <input
+              className="py-1 px-2 border-2 rounded-xl border-secondary flex-1"
+              value={fields.name}
+              placeholder="Название"
+              onChange={(e) =>
+                setFields((prev) => ({ ...prev, name: e.target.value }))
+              }
+            ></input>
+          </label>
         ) : (
           <h4>Задача {task.name}</h4>
         )}
         {isEdit ? (
-          <input
-            className="py-1 px-2 border-2 rounded-xl border-secondary flex-1"
-            value={fields.description}
-            placeholder="Описание"
-            onChange={(e) =>
-              setFields((prev) => ({ ...prev, description: e.target.value }))
-            }
-          ></input>
+          <label className="flex flex-col">
+            <h5>Описание</h5>
+            <input
+              className="py-1 px-2 border-2 rounded-xl border-secondary flex-1"
+              value={fields.description}
+              placeholder="Описание"
+              onChange={(e) =>
+                setFields((prev) => ({ ...prev, description: e.target.value }))
+              }
+            ></input>
+          </label>
         ) : (
           <h4>Описание: {task.description}</h4>
         )}
         {isEdit ? (
-          <select
-            className="py-1 px-2 border-2 rounded-xl border-secondary flex-1"
-            value={fields.numberOfPoints}
-            onChange={(e) =>
-              setFields((prev) => ({
-                ...prev,
-                numberOfPoints: parseInt(e.target.value),
-              }))
-            }
-          >
-            {[1, 3, 5, 8, 13].map((item) => (
-              <option key={item}>{item}</option>
-            ))}
-          </select>
+          <label className="flex flex-col">
+            <h5>Очки</h5>
+            <select
+              className="py-1 px-2 border-2 rounded-xl border-secondary flex-1"
+              value={fields.numberOfPoints}
+              onChange={(e) =>
+                setFields((prev) => ({
+                  ...prev,
+                  numberOfPoints: parseInt(e.target.value),
+                }))
+              }
+            >
+              {[1, 3, 5, 8, 13].map((item) => (
+                <option key={item}>{item}</option>
+              ))}
+            </select>
+          </label>
         ) : (
           <h4>Очки: {task.numberOfPoints}</h4>
         )}
         {isEdit ? (
-          <input
-            className="py-1 px-2 border-2 rounded-xl border-secondary flex-1"
-            value={fields.deadline}
-            type="date"
-            placeholder="Дата"
-            onChange={(e) => {
-              console.log(e.target.value);
-
-              setFields((prev) => ({ ...prev, deadline: e.target.value }));
-            }}
-          ></input>
+          <label className="flex flex-col">
+            <h5>Дэдлайн</h5>
+            <input
+              className="py-1 px-2 border-2 rounded-xl border-secondary flex-1"
+              value={fields.deadline}
+              type="date"
+              placeholder="Дата"
+              onChange={(e) => {
+                setFields((prev) => ({ ...prev, deadline: e.target.value }));
+              }}
+            ></input>
+          </label>
         ) : (
           <h4>Дэдлайн: {task.deadline}</h4>
         )}
-        <div className="flex gap-3">
+        <div className="flex gap-3 mt-3">
           {userData?.rolesName.includes("ROLE_EMPLOYEE") || !editable ? (
             <button
               onClick={() => {
@@ -116,18 +139,31 @@ export const TaskEl = ({
               Взять задачу
             </button>
           ) : (
-            <button
-              onClick={() => {
-                setIsEdit((prev) => !prev);
-                if (isEdit) {
-                  updateTask(fields);
-                }
-              }}
-              disabled={task.status !== "FREE"}
-              className="border-2 border-secondary p-2 rounded-xl"
-            >
-              {isEdit ? "Сохранить" : "Изменить задачу"}
-            </button>
+            <>
+              <button
+                onClick={() => {
+                  setIsEdit((prev) => !prev);
+                  if (isEdit) {
+                    updateTask(fields);
+                  }
+                }}
+                disabled={task.status !== "FREE"}
+                className="border-2 border-secondary p-2 rounded-xl"
+              >
+                {isEdit ? "Сохранить" : "Изменить задачу"}
+              </button>
+              {isEdit && (
+                <button
+                  disabled={task.status !== "FREE"}
+                  onClick={() => {
+                    setIsEdit((prev) => !prev);
+                  }}
+                  className="border-2 border-secondary p-2 rounded-xl"
+                >
+                  Отмена
+                </button>
+              )}
+            </>
           )}
           {userData?.rolesName.includes("ROLE_MANAGER") && editable && (
             <button
@@ -170,10 +206,49 @@ export const TaskEl = ({
           >
             Одобрить запрос
           </button>
+          <button
+            onClick={openDialog}
+            className="border-2 border-secondary p-2 rounded-xl disabled:bg-secondary/40"
+          >
+            Отклонить запрос
+          </button>
+          <dialog
+            ref={dialogRef}
+            className="rounded-lg m-0 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-main p-6 backdrop:bg-black/50"
+          >
+            <div className="flex flex-col gap-4">
+              <label>
+                <h5>Комментарий</h5>
+                <input
+                  type="text"
+                  value={comm}
+                  className="border-2 border-secondary p-2 rounded-xl disabled:bg-secondary/40"
+                  onInput={(e) => setComm(e.currentTarget.value)}
+                />
+              </label>
+
+              <button
+                onClick={() => {
+                  rejectTaskRequest(request.id, comm).then(
+                    (res) => res == true && alert("Операция выполнена успешно"),
+                  );
+                }}
+                className="border-2 border-secondary p-2 rounded-xl disabled:bg-secondary/40"
+              >
+                Добавить комментарий
+              </button>
+              <button
+                onClick={closeDialog}
+                className="border-2 border-secondary p-2 rounded-xl disabled:bg-secondary/40"
+              >
+                Отмена
+              </button>
+            </div>
+          </dialog>
         </div>
       </div>
     );
-  }else if (variant === "reports") {
+  } else if (variant === "reports") {
     return (
       <div className="p-2 border-2 border-secondary rounded-xl">
         <h4>Задача {request.title}</h4>
@@ -189,10 +264,47 @@ export const TaskEl = ({
           >
             Одобрить запрос
           </button>
+          <button
+            onClick={() => {
+              rejectTaskReport(request.id).then(
+                (res) => res == true && alert("Операция выполнена успешно"),
+              );
+            }}
+            className="border-2 border-secondary p-2 rounded-xl disabled:bg-secondary/40"
+          >
+            Отклонить запрос
+          </button>
         </div>
       </div>
     );
+  } else if (variant === "requests") {
+    return (
+      <div className="p-2 border-2 border-secondary rounded-xl">
+        <h4>Задача {request.task.name}</h4>
+        <h4>Описание: {request.task.description}</h4>
+        <h4>
+          Статус: {request.status === "PENDING" && "Отправлено на рассмотрение"}
+          {request.status === "ACCEPTED" && "Принято"}
+          {request.status === "REJECTED" && "Отклонено"}
+        </h4>
+        {(request.status !== "PENDING" || request.status === "ACCEPTED") && (
+          <h4>Комментарий: {request.comment}</h4>
+        )}
+      </div>
+    );
   } else if (variant === "workerTask") {
+    const sendTask = async () => {
+      const formData = new FormData();
+      files.forEach((file) => formData.append("files", file));
+      formData.append("taskId", request.id);
+      formData.append("title", request.name);
+      formData.append("description", request.description);
+      console.log(formData);
+
+      employeeSendTask(formData).then((res) => {
+        if (res === true) alert("Операция выполнена успешно");
+      });
+    };
     return (
       <div className={`p-2 relative border-2 border-secondary rounded-xl my-5`}>
         {Date.parse(request.deadline) - Date.now() > 0 ? (
@@ -220,22 +332,14 @@ export const TaskEl = ({
             {request.numberOfPoints}
           </h2>
         </div>
+        {/* Date.parse(request.deadline) - Date.now() > 0 */}
         {request.status === "ACTIVE" && (
-          <button
+          <DialogComponent
+            state={[files, setFiles]}
             onClick={() => {
-              employeeSendTask({
-                taskId: request.id,
-                title: request.name,
-                description: request.description,
-                files: [],
-              }).then(
-                (res) => res == true && alert("Операция выполнена успешно"),
-              );
+              sendTask();
             }}
-            className="border-2 border-secondary p-2 rounded-xl disabled:bg-secondary/40"
-          >
-            Сдать задачу
-          </button>
+          />
         )}
       </div>
     );
