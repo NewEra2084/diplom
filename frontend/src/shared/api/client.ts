@@ -58,6 +58,7 @@ api.interceptors.response.use(
 
 const deleteTemplate = async (
   url: string,
+  body = {},
   contentType = "application/json",
 ) => {
   try {
@@ -65,6 +66,7 @@ const deleteTemplate = async (
       headers: {
         "Content-Type": contentType,
       },
+      data: body,
     });
 
     return { data: data, status: status };
@@ -163,5 +165,5 @@ export {
   deleteTemplate,
   putTemplate,
   patchTemplate,
-  postMultyPartTemplate
+  postMultyPartTemplate,
 };

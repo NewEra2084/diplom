@@ -7,7 +7,7 @@ import {
   deleteQualifications,
   getQualifications,
 } from "@/entities/Qualification/api/endpoints";
-import {  Qualifications } from "@/entities/Qualification/model/types";
+import { Qualifications } from "@/entities/Qualification/model/types";
 import { ListItem } from "@/widgets/ListItem";
 import { ListPanel } from "@/widgets/ListPanel/ListPanel";
 import { useEffect, useState } from "react";
@@ -24,8 +24,14 @@ export default function Page() {
       type: "text",
       validate: 3,
     },
-    { name: "description", placeholder: "Работа", value: "", type: "select" },
+    {
+      name: "description",
+      placeholder: "Работа",
+      value: jobs[0]?.id || "",
+      type: "select",
+    },
   ]);
+
   const [isOpen, setIsOpen] = useState(false);
   const [edited, setEdited] = useState<string | null>(null);
   const workerA = useLayoutState((state) => state.workerAdded);
@@ -38,7 +44,7 @@ export default function Page() {
             item.qualifications.map((item) => item),
           ) || []
         );
-      });      
+      });
       setW(false);
       setIsOpen(false);
     });
@@ -46,6 +52,13 @@ export default function Page() {
   useEffect(() => {
     getJobTitles().then((res) => setJobs(res || []));
   }, []);
+  useEffect(() => {
+    setFields((prev) =>
+      prev.map((item) =>
+        item.placeholder === "Работа" ? { ...item, value: jobs[0]?.id } : item,
+      ),
+    );
+  }, [jobs]);
   const Validate = async (purpose: "add" | "update") => {
     const res = fields.every((item) => {
       if (!item.validate) return true;
@@ -129,9 +142,7 @@ export default function Page() {
         {qualifications[0] ? (
           qualifications.map((qualification) => (
             <ListItem
-              title={
-                qualification?.name
-              }
+              title={qualification?.name}
               key={qualification.id}
               item={qualification}
               deleteItem={deleteQualifications}

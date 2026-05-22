@@ -208,7 +208,7 @@ export const UserData = ({ className, editable, updateId }: Props) => {
 
   return (
     <section
-      className={`${!editable ? "bg-secondary/10 rounded-2xl w-full" : ""} ${className}`}
+      className={`${!editable ? "bg-secondary/5 rounded-2xl w-full" : ""} ${className}`}
     >
       {editable && (
         <h2 className="text-2xl lg:text-3xl text-center mb-5 lg:mb-0 lg:text-left">

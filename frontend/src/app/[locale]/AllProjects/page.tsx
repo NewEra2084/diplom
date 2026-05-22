@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { fetchAllUsers } from "@/entities/User/api/endpoints";
 import { User } from "@/entities/User/model/types";
 import { ListAllItem } from "@/widgets/ListAllItem";
+import { usePinnedWorkersStore } from "@/widgets/ListAllItem/workersStore";
 
 export default function Page() {
   useAuthGuard(["ROLE_EMPLOYEE", "ROLE_MANAGER"]);
@@ -58,6 +59,7 @@ export default function Page() {
       }
     });
   }, []);
+  const workersStore = usePinnedWorkersStore();
 
   const Validate = async (purpose: "add" | "update") => {
     const res = fields.every((item) => {
@@ -79,13 +81,16 @@ export default function Page() {
         setW(true);
         setIsOpen(false);
         const prjs = await getProjects();
-        setProjects((prev) => prjs);
-        console.log(projects);
+        setProjects((prev) => prjs || []);
+        if (prjs !== null) {
+          workersStore.addProject(prjs);
+        }
       }
     }
   };
   const { asideIsOpen, viewport } = useLayoutState();
   const filters = [{ id: 2, name: "string", link: "string", type: "string" }];
+console.log(fields);
 
   return (
     <div className="flex h-full lg:gap-3">

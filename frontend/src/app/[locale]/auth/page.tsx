@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { UserStore } from "@/entities/User/model/store";
-import { useRouter } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { auth } from "@/features/auth/endpoints";
 import { FormLabelInput } from "@/shared/ui/FormLabelInput";
 import { FormButton } from "@/shared/ui/FormButton";
@@ -41,8 +41,11 @@ export default function Page() {
   };
 
   return (
-    <div className="flex h-full divide-x-2">
-      <div className="hidden lg:block lg:flex-3"></div>
+    <div className="flex h-full divide-x-2 min-h-[50vh]">
+      <div className="hidden lg:flex lg:flex-3 items-center flex-col justify-center">
+        <h1 className="text-4xl mb-5">Присоединяйтесь к своей компании!</h1>
+        <Link href={"/buy"} className="text-xl text-gray-500"><span className="opacity-50">Или</span> <span className="opacity-50 hover:opacity-100">создайте свою</span></Link>
+      </div>
       <form
         className="flex gap-10 flex-1 lg:pl-4 flex-col justify-center items-center"
         onSubmit={(e) => {

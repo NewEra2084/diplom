@@ -6,10 +6,11 @@ import { addTask, getTaskCategories } from "@/entities/Task/api/endpoints";
 import { Task } from "@/entities/Task/model/types";
 import { fetchAllUsers } from "@/entities/User/api/endpoints";
 import { User } from "@/entities/User/model/types";
-import { postTemplate } from "@/shared/api/client";
+import { deleteTemplate, postTemplate } from "@/shared/api/client";
 import { CustomCheckbox } from "@/shared/ui/UICheckbox";
 import { Pencil, PencilOff, Search, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { usePinnedWorkersStore } from "./workersStore";
 
 type Props = {
   deleteItem: (id: string) => Promise<boolean>;
@@ -37,6 +38,7 @@ export const ListAllItem = ({
   setProjects,
 }: Props) => {
   const [edited, setEdited] = editedState;
+  const workersStore = usePinnedWorkersStore();
 
   const [tasks, setTasks] = useState<Task[]>(item.tasks);
   const [addTask4, setAddTask] = useState(false);
@@ -51,6 +53,7 @@ export const ListAllItem = ({
   const [categories, setCategories] = useState<
     { name: string; description: string }[]
   >([]);
+  const workerRef = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     fetchAllUsers().then((res) => {
       setWorkers(res || []);
@@ -76,7 +79,7 @@ export const ListAllItem = ({
       const a = await getTaskCategories();
       if (a) {
         setCategories(a);
-        setFields((prev) => ({ ...prev, taskCategoryId: a[0].id }));
+        setFields((prev) => ({ ...prev, taskCategoryId: a[0]?.id }));
       }
     })();
     setW(false);
@@ -89,6 +92,14 @@ export const ListAllItem = ({
     setAddTask(() => false);
     const prjs = await getProjects();
     setProjects((prev) => prjs || prev);
+  };
+
+  const openRef = () => {
+    workerRef.current?.showModal();
+  };
+
+  const closeRef = () => {
+    workerRef.current?.close();
   };
   return (
     <div className="w-full flex flex-col justify-between">
@@ -110,7 +121,65 @@ export const ListAllItem = ({
                 >
                   + Добавить задачу
                 </button>
-                
+                <button
+                  className="p-2 border-2 border-secondary rounded-xl"
+                  onClick={openRef}
+                >
+                  + Добавить сотрудника
+                </button>
+                <dialog
+                  ref={workerRef}
+                  className="min-w-[30%] border-2 border-secondary rounded-lg m-0 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-main p-6 backdrop:bg-black/50"
+                >
+                  {workers
+                    .filter((worker) =>
+                      worker.rolesName.includes("ROLE_EMPLOYEE"),
+                    )
+                    .map((worker) => (
+                      <div
+                        key={worker.id}
+                        className="flex p-2 rounded-lg borer-2 items-center justify-between"
+                      >
+                        <h5>{worker.firstName + " " + worker.lastName}</h5>
+                        {!workersStore.projectHasWorker(item.id, worker.id) ? (
+                          <button
+                            className="p-2 border rounded-md hover:bg-accent/50"
+                            onClick={() => {
+                              postTemplate("/manager/pin/employee", {
+                                employeeId: worker.id,
+                                projectId: item.id,
+                              }).then((res) => {
+                                workersStore.addWorker(item.id, worker);
+                              });
+                            }}
+                          >
+                            +
+                          </button>
+                        ) : (
+                          <button
+                            className="p-2 border rounded-md hover:bg-accent/50"
+                            onClick={() => {
+                              deleteTemplate("/manager/unpin/employee", {
+                                employeeId: worker.id,
+                                projectId: item.id,
+                              }).then((res) => {
+                                workersStore.removeWorker(item.id, worker.id);
+                              });
+                            }}
+                          >
+                            -
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  <button
+                    onClick={closeRef}
+                    className="w-full border-2 rounded-lg mt-5 py-3"
+                  >
+                    Назад
+                  </button>
+                </dialog>
+
                 <select
                   onChange={(e) => {
                     postTemplate("/manager/pin/employee", {
@@ -134,11 +203,11 @@ export const ListAllItem = ({
             )}
           </div>
         ) : (
-          <div className="flex gap-3">
-            <label className="flex flex-col">
+          <div className="flex gap-3 w-[80%]">
+            <label className="flex flex-col flex-2">
               <h5>Название</h5>
               <input
-                className="p-2 border-2 rounded-xl border-secondary flex-1"
+                className="p-2 border-2 rounded-xl border-secondary "
                 value={editFields.name}
                 placeholder="От 3 символов"
                 onChange={(e) =>
@@ -146,10 +215,10 @@ export const ListAllItem = ({
                 }
               ></input>
             </label>
-            <label className="flex flex-col">
+            <label className="flex flex-col flex-3">
               <h5>Описание</h5>
               <input
-                className="p-2 border-2 rounded-xl border-secondary flex-1"
+                className="p-2 border-2 rounded-xl border-secondary "
                 value={editFields.description}
                 placeholder="От 10 символов"
                 onChange={(e) =>
@@ -220,6 +289,7 @@ export const ListAllItem = ({
                   setItems((prev) =>
                     prev.filter((item2) => item.id !== item2.id),
                   );
+                  workersStore.removeProject(item.id)
                 }
               }}
             ></Trash2>
