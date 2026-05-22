@@ -39,4 +39,7 @@ public interface TaskReportRepository extends JpaRepository<TaskReport, UUID> {
             order by tr.createdAt desc
             """)
     List<TaskReport> findAllWithoutProject();
+
+    @EntityGraph(attributePaths = {"employeeTask.task"})
+    Optional<TaskReport> findWithTaskById(UUID id);
 }
