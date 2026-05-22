@@ -179,26 +179,6 @@ export const ListAllItem = ({
                     Назад
                   </button>
                 </dialog>
-
-                <select
-                  onChange={(e) => {
-                    postTemplate("/manager/pin/employee", {
-                      employeeId: e.target.value,
-                      projectId: item.id,
-                    });
-                  }}
-                >
-                  <option disabled>Прикрепить сотрудника</option>
-                  {workers
-                    .filter((worker) =>
-                      worker.rolesName.includes("ROLE_EMPLOYEE"),
-                    )
-                    .map((worker) => (
-                      <option key={worker.id} value={worker.id}>
-                        {worker.firstName + " " + worker.lastName}
-                      </option>
-                    ))}
-                </select>
               </>
             )}
           </div>

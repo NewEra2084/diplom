@@ -18,7 +18,7 @@ export const getTasks = async () => {
   return data;
 };
 export const addTask = async (task: Omit<Task, "id">) => {
-  const { data, status } = await postTemplate("/task/add", task);
+  const { data, status } = await postTemplate("/task/add", task, "multipart/form-data");
   if (status >= 400) {
     return null;
   }
