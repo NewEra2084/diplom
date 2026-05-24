@@ -93,8 +93,7 @@ export default function Page() {
 console.log(fields);
 
   return (
-    <div className="flex h-full lg:gap-3">
-      <Aside title="Фильтры" filters={filters} />
+    <div className="flex h-full lg:gap-3 min-h-[60vh]">
       {((viewport < 800 && !asideIsOpen) || viewport >= 800) && (
         <Body>
           <div className="w-full h-full flex flex-col relative overflow-y-scroll">
@@ -131,12 +130,14 @@ console.log(fields);
                         key={field.name}
                         className="border-2 rounded-xl outline-none p-2"
                         value={field.value}
-                        onChange={(e) => {
+                        onChange={(e) => {                          
                           setFields((prev) =>
                             prev.map((item) =>
-                              item.name === field.name
+                              {console.log(item, e.target.value);
+                              
+                                return item.name === "managerId"
                                 ? { ...item, value: e.target.value }
-                                : item,
+                                : item}
                             ),
                           );
                         }}

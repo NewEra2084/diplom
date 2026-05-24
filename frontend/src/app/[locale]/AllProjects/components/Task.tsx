@@ -132,6 +132,7 @@ export const TaskEl = ({
             <button
               onClick={() => {
                 employeeTakeTask(task.id);
+                
               }}
               disabled={task.status !== "FREE" || !project?.canTake}
               className="border-2 border-secondary p-2 rounded-xl disabled:bg-secondary/40"

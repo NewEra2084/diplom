@@ -44,6 +44,10 @@ export const employeeTakeTask = async (taskId: string) => {
   if (status >= 400) {
     return null;
   }
+  else{
+
+    alert("Вы отправили запрос на выполнение задачи");
+  }
   return data;
 };
 export const employeeSendTask = async (task: FormData) => {

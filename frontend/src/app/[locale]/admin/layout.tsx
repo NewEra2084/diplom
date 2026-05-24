@@ -6,9 +6,9 @@ import { Body } from "@/widgets/body/Body";
 import { ReactNode } from "react";
 
 const elements = [
-  { name: "Workers", id: 0, link: "workers" },
-  { name: "Qualifications", id: 1, link: "qualifications" },
-  { name: "Jobs", id: 2, link: "jobs" },
+  { name: "Работники", id: 0, link: "workers" },
+  { name: "Квалификации", id: 1, link: "qualifications" },
+  { name: "Работы", id: 2, link: "jobs" },
 ];
 
 export default function Page({ children }: { children: ReactNode }) {
