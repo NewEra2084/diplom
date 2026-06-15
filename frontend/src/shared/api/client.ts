@@ -1,7 +1,6 @@
 import axios from "axios";
 import { BACKEND_API } from "../config/env";
 import { jwtDecode } from "jwt-decode";
-import { s } from "motion/react-m";
 
 const api = axios.create({
   baseURL: BACKEND_API,

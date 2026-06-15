@@ -63,7 +63,7 @@ export const TaskEl = ({
   });
   const userData = UserStore((store) => store.user);
   useEffect(() => {
-    if (!request.files) return;
+    if (!request?.files) return;
 
     const fetchFiles = async () => {
       const promises = request.files.map(async (str) => {
