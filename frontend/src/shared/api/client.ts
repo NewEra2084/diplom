@@ -36,7 +36,6 @@ api.interceptors.request.use(async (config) => {
       localStorage.setItem("accessToken", refresh.data.accessToken);
       localStorage.setItem("refreshToken", refresh.data.refreshToken);
     } catch (error) {
-      // window.location.href = "/auth";
       return Promise.reject(error);
     }
   } else if (token) {
