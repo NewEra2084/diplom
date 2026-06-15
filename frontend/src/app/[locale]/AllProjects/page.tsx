@@ -90,13 +90,12 @@ export default function Page() {
   };
   const { asideIsOpen, viewport } = useLayoutState();
   const filters = [{ id: 2, name: "string", link: "string", type: "string" }];
-console.log(fields);
 
   return (
     <div className="flex h-full lg:gap-3 min-h-[60vh]">
       {((viewport < 800 && !asideIsOpen) || viewport >= 800) && (
         <Body>
-          <div className="w-full h-full flex flex-col relative overflow-y-scroll">
+          <div className="w-full h-full flex flex-col relative overflow-y-scroll scrollbar-hidden">
             {managers[0] && (
               <ListPanel isOpen={isOpen} setIsOpen={setIsOpen}>
                 <form

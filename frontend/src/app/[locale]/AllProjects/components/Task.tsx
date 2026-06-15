@@ -1,4 +1,5 @@
 import { Project } from "@/entities/Project/model/types";
+import JSZip from "jszip";
 import {
   acceptTaskReport,
   acceptTaskRequest,
@@ -12,8 +13,10 @@ import {
 import { Task, TaskInProject } from "@/entities/Task/model/types";
 import { UserStore } from "@/entities/User/model/store";
 import { User } from "@/entities/User/model/types";
+import { getBlobTemplate, getTemplate } from "@/shared/api/client";
 import { DialogComponent } from "@/shared/ui/Dialog";
-import { useRef, useState } from "react";
+import { ArrowBigDown, Download } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 type Props = {
   task?: TaskInProject;
@@ -27,6 +30,8 @@ type Props = {
     task: Task;
   };
 };
+
+const handleDownload = () => {};
 
 export const TaskEl = ({
   task,
@@ -57,6 +62,70 @@ export const TaskEl = ({
     projectId: project?.id || "",
   });
   const userData = UserStore((store) => store.user);
+  useEffect(() => {
+    if (!request.files) return;
+
+    const fetchFiles = async () => {
+      const promises = request.files.map(async (str) => {
+        const response = await getBlobTemplate(`/file/get/report/${str}`);
+        return response?.data as File;
+      });
+      const results = await Promise.all(promises);
+      const validFiles = results.filter(
+        (file) => file !== undefined && file !== null,
+      );
+
+      setFiles((prev) => [...validFiles]);
+    };
+
+    fetchFiles();
+  }, []);
+  console.log(files);
+  const getFileExtension = async (blob: Blob): Promise<string> => {
+    // По MIME-типу
+    if (blob.type === "image/png") return ".png";
+    if (blob.type === "image/jpeg") return ".jpg";
+    if (blob.type === "application/pdf") return ".pdf";
+    if (blob.type === "text/plain") return ".txt";
+    if (
+      blob.type ===
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    )
+      return ".docx";
+
+    // По магическим байтам для PNG
+    const bytes = await blob.slice(0, 8).arrayBuffer();
+    const uint8 = new Uint8Array(bytes);
+    if (
+      uint8[0] === 0x89 &&
+      uint8[1] === 0x50 &&
+      uint8[2] === 0x4e &&
+      uint8[3] === 0x47
+    ) {
+      return ".png";
+    }
+
+    return ".bin"; // неизвестный тип
+  };
+  const downloadAll = async () => {
+    const zip = new JSZip();
+
+    const fileTypes = await Promise.all(files.map((file)=>getFileExtension(file)));
+    files.forEach((file, id) => {
+      zip.file(id+fileTypes[id], file);
+    });
+
+    const zipBlob = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(zipBlob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "documents.zip";
+    link.click();
+
+    URL.revokeObjectURL(url);
+  };
+
   if (variant === "projects") {
     return (
       <div className="p-2 border-2 border-secondary rounded-xl">
@@ -132,7 +201,6 @@ export const TaskEl = ({
             <button
               onClick={() => {
                 employeeTakeTask(task.id);
-                
               }}
               disabled={task.status !== "FREE" || !project?.canTake}
               className="border-2 border-secondary p-2 rounded-xl disabled:bg-secondary/40"
@@ -170,11 +238,8 @@ export const TaskEl = ({
             <button
               className="border-2 border-secondary p-2 rounded-xl"
               onClick={() => {
-                const confirmation = confirm("Вы уверены?");
-                if (confirmation) {
-                  deleteTask(task.id);
-                  delet && delet(task.id);
-                }
+                deleteTask(task.id);
+                delet && delet(task.id);
               }}
             >
               Удалить задачу
@@ -254,6 +319,63 @@ export const TaskEl = ({
       <div className="p-2 border-2 border-secondary rounded-xl">
         <h4>Задача {request.title}</h4>
         <h4>Описание: {request.description}</h4>
+        <h4>Файлы:</h4>
+        <div className="p-2 border flex gap-4 my-2 relative">
+          <Download
+            className="right-3 top-[50%] translate-y-[-50%] absolute"
+            onClick={downloadAll}
+          ></Download>
+          {files.map((item, id) => {
+            const url = URL.createObjectURL(item);
+            if (item.type.includes("image")) {
+              return (
+                <div key={id} className="flex flex-col gap-2 max-w-32">
+                  <img src={url} className="w-full"></img>
+                  <a
+                    href={url}
+                    download
+                    className="border rounded-xl p-1 text-center"
+                  >
+                    Скачать
+                  </a>
+                </div>
+              );
+            } else {
+              const mime = item.type;
+              let typ = "Неизвестный тип";
+
+              if (mime === "text/plain") typ = "txt";
+              if (mime === "application/msword") typ = "doc";
+              if (
+                mime ===
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              )
+                typ = "docx";
+              if (mime === "text/html") typ = "html";
+              if (mime === "application/pdf") typ = "pdf";
+              if (mime === "application/json") typ = "json";
+
+              return (
+                <div key={id} className="flex flex-col gap-2 max-w-32">
+                  <div
+                    key={id}
+                    className="border-2 w-full h-full text-center p-2"
+                  >
+                    Текстовый файл
+                    <p>Тип: {typ}</p>
+                  </div>
+                  <a
+                    href={url}
+                    download
+                    className="border rounded-xl p-1 text-center"
+                  >
+                    Скачать
+                  </a>
+                </div>
+              );
+            }
+          })}
+        </div>
         <div className="flex gap-3">
           <button
             onClick={() => {

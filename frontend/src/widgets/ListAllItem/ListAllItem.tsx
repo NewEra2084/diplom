@@ -85,13 +85,18 @@ export const ListAllItem = ({
     setW(false);
   }, [setW]);
 
-  const [_, setItems] = listState;
+  const [getItems, setItems] = listState;
   const Validate = async (fields) => {
-    addTask(fields);
-    setW(true);
-    setAddTask(() => false);
-    const prjs = await getProjects();
-    setProjects((prev) => prjs || prev);
+    const newTask = await addTask(fields);
+    if (newTask) {      
+      setW(false);
+      setAddTask(() => false);
+      const prjs = await getProjects();
+      setProjects((prev) => prjs || prev);
+      console.log(prjs.find(i=>i.id===item.id));
+      
+      setTasks(()=>(prjs.find(i=>i.id===item.id).tasks));      
+    }
   };
 
   const openRef = () => {
@@ -108,8 +113,8 @@ export const ListAllItem = ({
         className={`p-2 relative w-full rounded-t-xl border-2 border-secondary flex ${manager ? "justify-between" : "justify-center"} items-center`}
       >
         {edited !== item.id ? (
-          <div className="flex gap-10 items-center">
-            <h4 className={`${manager ? "" : "text-center"}`}>{title}</h4>
+          <div className="flex gap-4 items-center">
+            <h4 className={`${manager ? "max-w-[40%]" : "text-center"}`}>{title}</h4>
             {manager && (
               <h4>Менеджер: {manager?.firstName + " " + manager?.lastName}</h4>
             )}
@@ -269,7 +274,7 @@ export const ListAllItem = ({
                   setItems((prev) =>
                     prev.filter((item2) => item.id !== item2.id),
                   );
-                  workersStore.removeProject(item.id)
+                  workersStore.removeProject(item.id);
                 }
               }}
             ></Trash2>
@@ -355,6 +360,7 @@ export const ListAllItem = ({
       )}
       <div className="p-2 rounded-b-xl border-2 border-t-0 border-secondary flex flex-col gap-3 max-h-[50vh] overflow-y-scroll">
         {tasks.map((task) => (
+          
           <TaskEl
             delet={(id: string) => {
               setTasks((prev) => prev.filter((prevTask) => prevTask.id !== id));

@@ -158,6 +158,22 @@ const getTemplate = async <T>(
     throw error;
   }
 };
+const getBlobTemplate = async <T>(
+  url: string,
+  contentType = "application/json",
+) => {
+  try {
+    const { data, status } = await api.get(url, {
+      headers: {
+        "Content-Type": contentType,
+      },
+      responseType:"blob"
+    });
+    return { data: data as T, status: status };
+  } catch (error) {
+    throw error;
+  }
+};
 
 export {
   postTemplate,
@@ -166,4 +182,5 @@ export {
   putTemplate,
   patchTemplate,
   postMultyPartTemplate,
+  getBlobTemplate
 };

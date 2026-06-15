@@ -22,7 +22,7 @@ export const addTask = async (task: Omit<Task, "id">) => {
   if (status >= 400) {
     return null;
   }
-  return data;
+  return true;
 };
 export const updateTask = async (task: Task) => {
   const { data, status } = await putTemplate(`/task/update`, task);
